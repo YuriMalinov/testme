@@ -1,0 +1,8 @@
+<h1 class="page-header">Выберите тест</h1>
+<ul class="list-group">
+    <li class="list-group-item" ng-repeat="test in tests">
+        <h3>{{ test.test.title }}</h3>
+        <markdown text="test.test.description"></markdown>
+        <a class="btn btn-default" href="#/apply/:{{test.code}}">Пройти</a> <span>{{ test.test.time }}</span>
+    </li>
+</ul>

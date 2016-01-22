@@ -1,0 +1,24 @@
+title: Тест на знание БД
+
+description: |
+  Это простой базовый тест на знание БД
+
+  ```sql
+  SELECT * FROM your_knowledge
+  ```
+
+time: Около 5 минут
+
+questions:
+  - question: Как выбрать единичку?
+    timeOverride: 120
+    answers:
+      - |
+        +
+        ```sql
+        select 1
+        ```
+      - |
+        ```sql
+        select 2
+        ```
