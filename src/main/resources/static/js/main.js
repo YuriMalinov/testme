@@ -1,19 +1,15 @@
 var app = angular.module('Main', ['ngRoute', 'ngResource']);
 app.config(['$routeProvider', function ($routeProvider) {
-    $routeProvider.
-    when('/start', {
+    $routeProvider.when('/start', {
         templateUrl: '/views/start.html',
         controller: 'StartCtrl'
-    }).
-    when('/test/:passCode', {
+    }).when('/test/:passCode', {
         templateUrl: '/views/test.html',
         controller: 'TestCtrl'
-    }).
-    when('/done/:passCode', {
+    }).when('/done/:passCode', {
         templateUrl: '/views/done.html',
-        controller: 'PassCtrl'
-    }).
-    otherwise({
+        controller: 'DoneCtrl'
+    }).otherwise({
         redirectTo: '/start'
     })
 }]);
@@ -51,16 +47,19 @@ app.controller('TestCtrl', ['$scope', '$routeParams', '$location', '$http', '$in
     $scope.selected = {};
 
     $scope.secondsLeft = 0;
+    function fetchQuestion() {
+        $http.post('/data/current-question?passCode=' + passCode).then(function (response) {
+            $scope.question = response.data;
+            $scope.selected = {};
+            $scope.secondsLeft = Math.ceil(response.data.questionData.msLeft / 1000);
+            console.log(response.data);
+        });
+    }
 
-    $http.post('/data/current-question?passCode=' + passCode).then(function (response) {
-        $scope.question = response.data;
-        $scope.selected = {};
-        $scope.secondsLeft = Math.ceil(response.data.questionData.msLeft / 1000);
-        console.log(response.data);
-    });
+    fetchQuestion();
 
     $scope.selectAnswer = function (answer) {
-        if ($scope.question.multiVariant) {
+        if ($scope.question.questionData.multiAnswer) {
             $scope.selected[answer.index] = !$scope.selected[answer.index];
         } else if ($scope.selected[answer.index]) {
             $scope.selected = {};
@@ -75,9 +74,35 @@ app.controller('TestCtrl', ['$scope', '$routeParams', '$location', '$http', '$in
         return $scope.selected[answer.index];
     };
 
-    $interval(function() {
+    $scope.answer = function () {
+        var answers = [];
+        for (var i in $scope.selected) {
+            if ($scope.selected[i]) {
+                answers.push(i);
+            }
+        }
+        $http.post('/data/submit-answer', {passCode: passCode, answers: answers})
+            .then(function (result) {
+                if (result.data) {
+                    $location.path('/done/' + passCode);
+                } else {
+                    fetchQuestion();
+                }
+            });
+    };
+
+    $interval(function () {
         $scope.secondsLeft -= 1;
     }, 1000);
+}]);
+
+app.controller('DoneCtrl', ['$scope', '$routeParams', '$http', function ($scope, $routeParams, $http) {
+    var passCode = $routeParams.passCode;
+
+    $http.get('/data/score?passCode=' + passCode)
+        .then(function (response) {
+            $scope.score = response.data;
+        });
 }]);
 
 app.directive('markdown', function () {
@@ -93,7 +118,7 @@ app.directive('markdown', function () {
                 }
             });
             scope.$watch('text', function (text) {
-                var htmlText = marked(text);
+                var htmlText = text ? marked(text) : '';
                 element.html(htmlText);
             });
         }

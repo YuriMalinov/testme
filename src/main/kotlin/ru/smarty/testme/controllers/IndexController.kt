@@ -3,6 +3,7 @@ package ru.smarty.testme.controllers
 import com.fasterxml.jackson.annotation.JsonCreator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
+import org.springframework.util.FastByteArrayOutputStream
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.GET
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody
 import ru.smarty.testme.model.Test
 import ru.smarty.testme.model.TestPass
 import ru.smarty.testme.repositories.TestRepository
+import java.io.CharArrayWriter
+import java.io.PrintWriter
 import java.util.*
 
 @Controller
@@ -63,11 +66,18 @@ open class IndexController @Autowired constructor(
             throw BadRequest("Pass [$passCode] is already done.")
         }
 
-        return CodeWithQuestionData(pass.test.title, passCode, pass.isDone(), pass.currentQuestionData(true))
+        return CodeWithQuestionData(
+                testName = pass.test.title,
+                passCode = passCode,
+                done = pass.isDone(),
+                questionData = pass.currentQuestionData(true)
+        )
     }
 
+    data class CodeWithQuestionData(val testName: String, val passCode: String, val done: Boolean, val questionData: TestPass.QuestionData?)
 
-    data class SubmitAnswerRequest @JsonCreator constructor(val passCode: String, val answers: List<Int>)
+
+    data class SubmitAnswerRequest(val passCode: String, val answers: List<Int>)
 
     @ResponseBody
     @RequestMapping("/data/submit-answer", method = arrayOf(POST))
@@ -81,7 +91,9 @@ open class IndexController @Autowired constructor(
         }
 
         pass.answer(answers)
-        pass.startNext()
+        if (!pass.isDone()) {
+            pass.startNext()
+        }
 
         return pass.isDone()
     }
@@ -91,13 +103,22 @@ open class IndexController @Autowired constructor(
     fun score(passCode: String): Double {
         val pass = passes[passCode] ?: throw NotFound("Can't find pass with code [$passCode]")
 
-        if (pass.isDone()) {
+        if (!pass.isDone()) {
             throw BadRequest("Pass [$passCode] is not yet done.")
         }
 
         return pass.calculateScore()
-
     }
 
-    data class CodeWithQuestionData(val testName: String, val passCode: String, val done: Boolean, val questionData: TestPass.QuestionData?)
+    @RequestMapping("/admin/refresh", method = arrayOf(GET))
+    fun refresh(): String {
+        try {
+            testRepository.updateTests()
+            return "OK"
+        } catch (e: Exception) {
+            val writer = PrintWriter(CharArrayWriter())
+            e.printStackTrace(writer)
+            return writer.toString()
+        }
+    }
 }

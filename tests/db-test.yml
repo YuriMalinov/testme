@@ -10,7 +10,8 @@ description: |
 time: Около 5 минут
 
 questions:
-  - question: Как выбрать единичку?
+  -
+    question: Как выбрать единичку?
     timeOverride: 120
     answers:
       - |
@@ -22,3 +23,16 @@ questions:
         ```sql
         select 2
         ```
+  -
+    question: |+
+        Какие утверждения про следующий индекс верны?
+        ```sql
+        create index ix_data on my_table (a, b);
+        ```
+    answers:
+      - +Индекс ускоряет выборку `select * from my_table where a = ?`
+      - +Индекс ускоряет выборку `select * from my_table where a = ? and b = ?`
+      - +Индекс ускоряет выборку `select * from my_table where a = ? and b between ? and ?`
+      - +Индекс ускоряет выборку `select * from my_table where a = ? and c = ?`
+      - Индекс ускоряет выборку `select * from my_table where b = ?`
+      - Индекс ускоряет выборку `select * from my_table where c = ?`

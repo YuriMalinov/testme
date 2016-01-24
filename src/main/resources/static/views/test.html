@@ -1,18 +1,17 @@
 <h1 class="page-header">{{ question.testName }}</h1>
 
-<h2>Вопрос #{{ question.index }}/{{ question.questionCount}}
-    <span class="pull-right small">Осталось: {{ secondsLeft }} секунд</span>
-</h2>
+<span class="pull-right alert" ng-class="{'alert-danger': secondsLeft <= 10, 'alert-warning': secondsLeft > 10}">Осталось: {{ secondsLeft }} секунд</span>
+<h2>Вопрос #{{ question.questionData.index }}/{{ question.questionData.total}}</h2>
 <markdown text="question.questionData.question"></markdown>
-<div class="alert" ng-show="question.questionData.multiAnswer">Может быть несколько корректных ответов.</div>
 
 <h2>Варианты ответов:</h2>
-<div class="list-group">
+<div class="alert alert-warning" ng-show="question.questionData.multiAnswer">Может быть несколько корректных ответов.</div>
+<div class="list-group variants">
    <a class="list-group-item" ng-repeat="answer in question.questionData.answers" ng-click="selectAnswer(answer)"
       ng-class="{'list-group-item-success': isSelected(answer)}">
-       <h4 class="pull-left">{{ $index + 1 }}.&nbsp;</h4>
+       <span class="pull-left">{{ $index + 1 }}.&nbsp;</span>
        <markdown text="answer.value"></markdown>
    </a>
 </div>
 
-<button class="btn btn-lg" ng-class="{'btn-primary': secondsLeft > 10, 'btn-danger': secondsLeft <= 10}">Отправить ответ</button>
+<button class="btn btn-lg" ng-class="{'btn-primary': secondsLeft > 10, 'btn-danger': secondsLeft <= 10}" ng-click="answer()">Отправить ответ</button>

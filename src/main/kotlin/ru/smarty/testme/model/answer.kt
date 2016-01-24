@@ -12,13 +12,13 @@ class TestPass(val testCode: String, val person: String, val test: Test) {
     }
 
     fun answer(answers: List<Int>, now: Long = System.currentTimeMillis()) {
-        require(currentQuestion >= 0 && currentQuestion < answers.size)
+        require(!isDone())
 
         this.questionsWithAnswer[currentQuestion].answer(answers, now)
     }
 
     fun currentQuestionData(shuffle: Boolean, now: Long = System.currentTimeMillis()): QuestionData {
-        require(currentQuestion >= 0 && currentQuestion < questionsWithAnswer.size)
+        require(!isDone())
 
         val answer = questionsWithAnswer[currentQuestion]
         val answers = answer.question.answers.map { it.text }.withIndex().toArrayList()
@@ -32,7 +32,9 @@ class TestPass(val testCode: String, val person: String, val test: Test) {
                 time = time,
                 answers = answers,
                 isMultiAnswer = answer.question.isMultiAnswer(),
-                msLeft = (answer.started!! + time * 1000 - now).toInt()
+                msLeft = (answer.started!! + time * 1000 - now).toInt(),
+                index = currentQuestion + 1,
+                total = questionsWithAnswer.size
         )
     }
 
@@ -40,14 +42,16 @@ class TestPass(val testCode: String, val person: String, val test: Test) {
         require(!isDone()) { "Already done!" }
 
         currentQuestion += 1
-        questionsWithAnswer[currentQuestion].start(now)
+        if (!isDone()) {
+            questionsWithAnswer[currentQuestion].start(now)
+        }
     }
 
     fun isDone() = currentQuestion >= questionsWithAnswer.size
 
-    data class QuestionData(val question: String, val time: Int, val isMultiAnswer: Boolean, val answers: List<IndexedValue<String>>, val msLeft: Int)
+    data class QuestionData(val question: String, val time: Int, val isMultiAnswer: Boolean, val answers: List<IndexedValue<String>>, val msLeft: Int, val index: Int, val total: Int)
 
-    fun calculateScore(): Double = questionsWithAnswer.map { it.score() }.sum() / questionsWithAnswer.size
+    fun calculateScore(): Double = questionsWithAnswer.map { it.score() }.sum() * 5 / questionsWithAnswer.size
 }
 
 class QuestionAnswer(val originalIndex: Int, val question: Question) {
