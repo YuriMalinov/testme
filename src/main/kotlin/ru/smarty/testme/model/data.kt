@@ -1,6 +1,7 @@
 package ru.smarty.testme.model
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
 
 class Test {
     lateinit var title: String
@@ -14,6 +15,8 @@ class Question {
     lateinit var question: String
     var timeOverride: Int? = null
     lateinit var answers: List<AnswerVariant>
+
+    fun isMultiAnswer(): Boolean = answers.filter { it.isCorrect }.size > 1
 }
 
 class AnswerVariant(val text: String, val isCorrect: Boolean) {

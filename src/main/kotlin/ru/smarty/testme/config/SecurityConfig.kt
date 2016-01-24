@@ -13,8 +13,9 @@ open class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .antMatchers("/admin").authenticated()
                 .anyRequest().anonymous()
 
-                .and()
-                .httpBasic()
+                .and().httpBasic()
+
+                .and().csrf().disable()
     }
 
     @Autowired

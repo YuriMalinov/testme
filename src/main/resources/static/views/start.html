@@ -3,6 +3,14 @@
     <li class="list-group-item" ng-repeat="test in tests">
         <h3>{{ test.test.title }}</h3>
         <markdown text="test.test.description"></markdown>
-        <a class="btn btn-default" href="#/apply/:{{test.code}}">Пройти</a> <span>{{ test.test.time }}</span>
+        <a class="btn btn-default" ng-click="toggleApply(test)">Пройти</a> <span>{{ test.test.time }}</span>
+
+        <br/>
+        <br/>
+        <div class="panel panel-primary" ng-if="show[test.code]">
+            <div class="panel-heading">Представьтесь</div>
+            <div class="panel-body"><input type="text" class="form-control" ng-model="data.username" placeholder="Ваше имя" required></div>
+            <div class="panel-footer"><a class="btn btn-primary" ng-click="apply(test)">Начать прохождение теста</a></div>
+        </div>
     </li>
 </ul>
