@@ -3,7 +3,7 @@ package ru.smarty.testme.model
 import java.util.*
 
 class TestPass(val testCode: String, val person: String, val test: Test) {
-    val questionsWithAnswer: List<QuestionAnswer> = test.questions.mapIndexed { i, question -> QuestionAnswer(i, question) }.toArrayList()
+    val questionsWithAnswer: List<QuestionAnswer> = test.questions.mapIndexed { i, question -> QuestionAnswer(i, question, question.timeOverride ?: test.defaultTime) }.toArrayList()
     var currentQuestion = -1
         private set
 
@@ -54,7 +54,7 @@ class TestPass(val testCode: String, val person: String, val test: Test) {
     fun calculateScore(): Double = questionsWithAnswer.map { it.score() }.sum() * 5 / questionsWithAnswer.size
 }
 
-class QuestionAnswer(val originalIndex: Int, val question: Question) {
+class QuestionAnswer(val originalIndex: Int, val question: Question, val time: Int) {
     var started: Long? = null
     var answered: Long? = null
     var answers: List<Int> = emptyList()
@@ -75,7 +75,7 @@ class QuestionAnswer(val originalIndex: Int, val question: Question) {
 
     fun score(): Double {
         // A more clever logic for multianswers might be implemented
-        if (question.answers.withIndex().filter { it.value.isCorrect }.map { it.index } == answers) {
+        if (answered != null && duration()!! < time + 10 && question.answers.withIndex().filter { it.value.isCorrect }.map { it.index } == answers) {
             return 1.0
         } else {
             return 0.0

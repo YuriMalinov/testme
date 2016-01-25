@@ -1,6 +1,7 @@
 package ru.smarty.testme.controllers
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.util.FastByteArrayOutputStream
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.ResponseBody
 import ru.smarty.testme.model.Test
 import ru.smarty.testme.model.TestPass
+import ru.smarty.testme.model.Views
 import ru.smarty.testme.repositories.TestRepository
 import java.io.CharArrayWriter
 import java.io.PrintWriter
@@ -27,6 +29,7 @@ open class IndexController @Autowired constructor(
 
     @ResponseBody
     @RequestMapping("/data/tests")
+    @JsonView(Views.Public::class)
     fun tests(): List<TestWithCode> = testRepository.tests.map { TestWithCode(it.key, it.value) }
 
     data class TestWithCode(val code: String, val test: Test)
@@ -59,6 +62,7 @@ open class IndexController @Autowired constructor(
 
     @ResponseBody
     @RequestMapping("/data/current-question", method = arrayOf(POST))
+    @JsonView(Views.Public::class)
     fun startNext(passCode: String): CodeWithQuestionData {
         val pass = passes[passCode] ?: throw NotFound("Can't find pass with code [$passCode]")
 
