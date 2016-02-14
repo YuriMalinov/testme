@@ -3,7 +3,8 @@ package ru.smarty.testme.model
 import java.util.*
 
 class TestPass(val testCode: String, val person: String, val test: Test) {
-    val questionsWithAnswer: List<QuestionAnswer> = test.questions.mapIndexed { i, question -> QuestionAnswer(i, question, question.timeOverride ?: test.defaultTime) }.toArrayList()
+    val questionsWithAnswer: List<QuestionAnswer> = test.questions.mapIndexed { i, question ->
+        QuestionAnswer(i, question, question.timeOverride ?: test.defaultTime) }.toMutableList()
     var currentQuestion = -1
         private set
 
@@ -21,7 +22,7 @@ class TestPass(val testCode: String, val person: String, val test: Test) {
         require(!isDone())
 
         val answer = questionsWithAnswer[currentQuestion]
-        val answers = answer.question.answers.map { it.text }.withIndex().toArrayList()
+        val answers = answer.question.answers.map { it.text }.withIndex().toMutableList()
         if (shuffle) {
             Collections.shuffle(answers)
         }
