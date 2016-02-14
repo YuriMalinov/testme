@@ -1,6 +1,8 @@
 package ru.smarty.testme.model
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonView
 import java.util.*
 
@@ -28,32 +30,28 @@ class Question {
     /**
      * If not empty then answers must be empty. It means open question. Criteria describes how to check answers.
      */
-    @JsonView(Views.Detailed::class)
+    @JsonView(Views.Detailed::class, Views.Serialize::class)
     var criteria: List<Criteria> = ArrayList()
 
-    @JsonView(Views.Detailed::class)
+    @JsonView(Views.Detailed::class, Views.Serialize::class)
     var answers: List<AnswerVariant> = ArrayList()
 
-    fun isMultiAnswer(): Boolean = forceMultiAnswer || answers.filter { it.isCorrect }.size > 1
-}
+    @JsonIgnoreProperties(allowGetters = true)
+    @JsonIgnore
+    fun isMultiAnswer(): Boolean = forceMultiAnswer || answers.filter { it.correct }.size > 1
 
-class Criteria(var text: String) {
     companion object {
-        @JvmStatic
-        @JsonCreator
-        fun create(value: String): Criteria {
-            return Criteria(value)
+        val Null = Question()
+        init {
+            Null.question = "Null question object"
         }
     }
 }
 
-class AnswerVariant(val text: String, @JsonView(Views.Admin::class) val isCorrect: Boolean) {
-    companion object {
-        @JvmStatic
-        @JsonCreator
-        fun create(value: String): AnswerVariant {
-            val isCorrect = value.startsWith("+", true)
-            return AnswerVariant(value.trimStart('+'), isCorrect)
-        }
+class Criteria(var text: String) {
+}
+
+class AnswerVariant(val text: String, @JsonView(Views.Admin::class, Views.Serialize::class) val correct: Boolean) {
+    constructor(value: String) : this(value.trimStart('+'), value.startsWith('+')) {
     }
 }

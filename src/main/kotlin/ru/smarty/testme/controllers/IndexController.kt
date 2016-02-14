@@ -1,10 +1,8 @@
 package ru.smarty.testme.controllers
 
-import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
-import org.springframework.util.FastByteArrayOutputStream
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.GET
@@ -13,26 +11,31 @@ import org.springframework.web.bind.annotation.ResponseBody
 import ru.smarty.testme.model.Test
 import ru.smarty.testme.model.TestPass
 import ru.smarty.testme.model.Views
+import ru.smarty.testme.repositories.TestPassRepository
 import ru.smarty.testme.repositories.TestRepository
+import ru.smarty.testme.utils.currentUser
 import java.io.CharArrayWriter
 import java.io.PrintWriter
-import java.util.*
 
+@Suppress("unused")
 @Controller
 open class IndexController @Autowired constructor(
-        private val testRepository: TestRepository
+        private val testRepository: TestRepository,
+        private val passRepository: TestPassRepository
 ) {
-    private val passes = HashMap<String, TestPass>()
-
     @RequestMapping("/")
     fun index() = "index"
 
     @ResponseBody
     @RequestMapping("/data/tests")
     @JsonView(Views.Public::class)
-    fun tests(): List<TestWithCode> = testRepository.tests.map { TestWithCode(it.key, it.value) }
+    fun tests() = testRepository.tests.map { TestWithCode(it.key, it.value) }
 
     data class TestWithCode(val code: String, val test: Test)
+
+    @ResponseBody
+    @RequestMapping("/data/user")
+    fun user() = currentUser()
 
 
     class ApplyRequest {
@@ -50,28 +53,34 @@ open class IndexController @Autowired constructor(
     @RequestMapping("/data/apply", method = arrayOf(POST))
     fun apply(@RequestBody request: ApplyRequest): Value<String> {
         val test = testRepository.testByCode(request.testCode) ?: throw NotFound("Can't find test with code [${request.testCode}]")
-        val pass = TestPass(request.testCode, request.userName, test)
 
         val passCode = java.lang.Long.toUnsignedString(Math.round(Math.random() * Int.MAX_VALUE), 16)
-        passes[passCode] = pass
-
+        val pass = TestPass(request.testCode, passCode, currentUser(), test)
         pass.startNext()
+
+        passRepository.save(pass)
+
 
         return Value(passCode)
     }
 
+    fun findPass(passCode: String): TestPass =
+            passRepository.findByCode(passCode) ?: throw NotFound("Can't find pass with code [$passCode]")
+
     @ResponseBody
     @RequestMapping("/data/current-question", method = arrayOf(POST))
     @JsonView(Views.Public::class)
-    fun startNext(passCode: String): CodeWithQuestionData {
-        val pass = passes[passCode] ?: throw NotFound("Can't find pass with code [$passCode]")
+    fun currentQuestion(passCode: String): CodeWithQuestionData {
+        val pass = findPass(passCode)
 
         if (pass.isDone()) {
             throw BadRequest("Pass [$passCode] is already done.")
         }
 
+        val test = testRepository.testByCode(pass.testCode) ?: throw NotFound("Can't find test with code [${pass.testCode}]")
+
         return CodeWithQuestionData(
-                testName = pass.test.title,
+                testName = test.title,
                 passCode = passCode,
                 done = pass.isDone(),
                 questionData = pass.currentQuestionData(true)
@@ -88,7 +97,7 @@ open class IndexController @Autowired constructor(
     fun submitAnswer(@RequestBody request: SubmitAnswerRequest): Boolean {
         val (passCode, answers) = request
 
-        val pass = passes[passCode] ?: throw NotFound("Can't find pass with code [$passCode]")
+        val pass = findPass(passCode)
 
         if (pass.isDone()) {
             throw BadRequest("Pass [$passCode] is already done.")
@@ -98,6 +107,7 @@ open class IndexController @Autowired constructor(
         if (!pass.isDone()) {
             pass.startNext()
         }
+        passRepository.save(pass)
 
         return pass.isDone()
     }
@@ -105,7 +115,7 @@ open class IndexController @Autowired constructor(
     @ResponseBody
     @RequestMapping("/data/score", method = arrayOf(GET))
     fun score(passCode: String): Double {
-        val pass = passes[passCode] ?: throw NotFound("Can't find pass with code [$passCode]")
+        val pass = findPass(passCode)
 
         if (!pass.isDone()) {
             throw BadRequest("Pass [$passCode] is not yet done.")

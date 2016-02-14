@@ -14,9 +14,19 @@ app.config(['$routeProvider', function ($routeProvider) {
     })
 }]);
 
-app.controller('StartCtrl', ['$scope', '$resource', '$http', '$location', '$window', function ($scope, $resource, $http, $location, $window) {
+app.factory('UserData', function ($http) {
+    var user = {user: {}};
+    $http.get('/data/user').then(function (res) {
+        angular.extend(user.user, res.data);
+    });
+
+    return user;
+});
+
+app.controller('StartCtrl', ['$scope', '$resource', '$http', '$location', '$window', 'UserData', function ($scope, $resource, $http, $location, $window, UserData) {
     var Tests = $resource('/data/tests');
     $scope.tests = Tests.query();
+    $scope.user = UserData.user;
 
     $scope.show = {};
     $scope.data = {username: ""};

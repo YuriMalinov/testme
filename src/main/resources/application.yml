@@ -1,1 +1,26 @@
 spring.jackson.mapper.default-view-inclusion: true
+
+spring.datasource:
+  url: "jdbc:postgresql://localhost/testme"
+  username: testme
+  password: testme
+  driver-class-name: org.postgresql.Driver
+
+
+auth.ldap:
+  enabled: false
+  url: ""
+  managerDn: ""
+  managerPassword: ""
+  userSearchBase: ""
+  userSearchFilter: "uid={0}"
+
+auth.password:
+  user: admin
+  password: admin
+
+
+spring:
+  jpa:
+    hibernate:
+      naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy

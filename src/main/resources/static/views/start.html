@@ -1,4 +1,7 @@
-<h1 class="page-header">Выберите тест</h1>
+<h1 class="page-header">
+    Выберите тест
+    <span class="small pull-right">{{ user.userName }}</span>
+</h1>
 <ul class="list-group">
     <li class="list-group-item" ng-repeat="test in tests">
         <h3>{{ test.test.title }}</h3>
