@@ -1,6 +1,5 @@
 package ru.smarty.testme.model
 
-import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonView
@@ -11,6 +10,8 @@ class Test {
     lateinit var description: String
     lateinit var time: String
     var defaultTime: Int = 60
+    var shuffleQuestions = false
+    var shuffleAnswers = false
 
     @JsonView(Views.Detailed::class)
     var questions: List<Question> = arrayListOf()

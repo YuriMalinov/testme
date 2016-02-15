@@ -5,13 +5,23 @@
 <markdown text="question.questionData.question"></markdown>
 
 <h2>Варианты ответов:</h2>
-<div class="alert alert-warning" ng-show="question.questionData.multiAnswer">Может быть несколько корректных ответов.</div>
+<div class="alert alert-info" ng-show="question.questionData.multiAnswer">Может быть несколько корректных ответов.</div>
 <div class="list-group variants">
-   <a class="list-group-item" ng-repeat="answer in question.questionData.answers" ng-click="selectAnswer(answer)"
-      ng-class="{'list-group-item-success': isSelected(answer)}">
-       <span class="pull-left">{{ $index + 1 }}.&nbsp;</span>
-       <markdown text="answer.value"></markdown>
-   </a>
+    <a class="list-group-item" ng-repeat="answer in question.questionData.answers" ng-click="selectAnswer(answer)"
+       ng-class="{'list-group-item-success': isSelected(answer)}">
+        <span class="pull-left">{{ $index + 1 }}.&nbsp;</span>
+        <markdown text="answer.value"></markdown>
+    </a>
 </div>
 
-<button class="btn btn-lg" ng-class="{'btn-primary': secondsLeft > 10, 'btn-danger': secondsLeft <= 10}" ng-click="answer()">Отправить ответ</button>
+<div class="panel panel-info top-buffer" ng-show="addComment">
+    <div class="panel-body">
+        <textarea class="form-control" ng-model="comment" placeholder="Ваш комментарий"></textarea>
+    </div>
+</div>
+
+<button class="btn btn-lg" ng-class="{'btn-primary': secondsLeft > 10, 'btn-danger': secondsLeft <= 10}"
+        ng-click="answer()">Отправить ответ
+</button>
+
+&nbsp;&nbsp;<a ng-click="addComment = !addComment">некорректный вопрос? дай знать!</a>

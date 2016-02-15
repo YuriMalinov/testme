@@ -1,18 +1,21 @@
-title: Тест на знание БД
+title: Sample test
 
 description: |
-  Это простой базовый тест на знание БД
+  This test shows how to use different features of this stuff.
 
   ```sql
   SELECT * FROM your_knowledge
   ```
 
-time: Около 5 минут
-
+time: About 2 minutes   # Text description of time estimate
+defaultTime: 65         # Default time for question, in seconds, could be overriden with timeOverride
+shuffleQuestions: true
+shuffleAnswers: true
 questions:
   -
     question: Как выбрать единичку?
     timeOverride: 120
+    weight: 2
     answers:
       - |
         +
@@ -24,15 +27,17 @@ questions:
         select 2
         ```
   -
-    question: |+
-        Какие утверждения про следующий индекс верны?
-        ```sql
-        create index ix_data on my_table (a, b);
-        ```
+    question: Пара слов о работе, укажите, зачем вы здесь?
+    criteria:
+      - Посмотреть, что чувак хочет работать.
+      - Ну и конечно, что хочет изменить мир к лучшему
+
+  -
+    question: На каких языках нужно разрабатывать веб?
+    advancedWeight: true
     answers:
-      - +Индекс ускоряет выборку `select * from my_table where a = ?`
-      - +Индекс ускоряет выборку `select * from my_table where a = ? and b = ?`
-      - +Индекс ускоряет выборку `select * from my_table where a = ? and b between ? and ?`
-      - +Индекс ускоряет выборку `select * from my_table where a = ? and c = ?`
-      - Индекс ускоряет выборку `select * from my_table where b = ?`
-      - Индекс ускоряет выборку `select * from my_table where c = ?`
+      - +PHP
+      - +JS
+      - +CSS
+      - +HTML
+      - Assembler

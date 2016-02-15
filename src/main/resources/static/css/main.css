@@ -1,1 +1,11 @@
-.variants p {margin: 0}
+.variants p {
+    margin: 0
+}
+
+a[ng-click] {
+    cursor: pointer
+}
+
+.top-buffer {
+    margin-top: 20px;
+}

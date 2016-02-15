@@ -23,27 +23,19 @@ app.factory('UserData', function ($http) {
     return user;
 });
 
-app.controller('StartCtrl', ['$scope', '$resource', '$http', '$location', '$window', 'UserData', function ($scope, $resource, $http, $location, $window, UserData) {
+app.controller('StartCtrl', ['$scope', '$resource', '$http', '$location', '$window', function ($scope, $resource, $http, $location, $window) {
     var Tests = $resource('/data/tests');
     $scope.tests = Tests.query();
-    $scope.user = UserData.user;
 
     $scope.show = {};
-    $scope.data = {username: ""};
 
     $scope.toggleApply = function (test) {
         $scope.show[test.code] = !$scope.show[test.code];
     };
 
     $scope.apply = function (test) {
-        if ($scope.data.username.trim() == "") {
-            $window.alert("Username is required!");
-            return;
-        }
-
         $http.post('/data/apply', {
-            testCode: test.code,
-            userName: $scope.data.username
+            testCode: test.code
         }).then(function (result) {
             $location.path('/test/' + result.data.value)
         });
@@ -62,6 +54,8 @@ app.controller('TestCtrl', ['$scope', '$routeParams', '$location', '$http', '$in
             $scope.question = response.data;
             $scope.selected = {};
             $scope.secondsLeft = Math.ceil(response.data.questionData.msLeft / 1000);
+            $scope.addCommment = false;
+            $scope.comment = '';
             console.log(response.data);
         });
     }
@@ -91,7 +85,7 @@ app.controller('TestCtrl', ['$scope', '$routeParams', '$location', '$http', '$in
                 answers.push(i);
             }
         }
-        $http.post('/data/submit-answer', {passCode: passCode, answers: answers})
+        $http.post('/data/submit-answer', {passCode: passCode, answers: answers, comment: $scope.comment})
             .then(function (result) {
                 if (result.data) {
                     $location.path('/done/' + passCode);
@@ -113,6 +107,10 @@ app.controller('DoneCtrl', ['$scope', '$routeParams', '$http', function ($scope,
         .then(function (response) {
             $scope.score = response.data;
         });
+}]);
+
+app.controller('NavBarCtrl', ['$scope', 'UserData', function($scope, UserData) {
+    $scope.user = UserData.user;
 }]);
 
 app.directive('markdown', function () {

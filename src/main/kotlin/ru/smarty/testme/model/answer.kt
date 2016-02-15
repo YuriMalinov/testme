@@ -30,43 +30,51 @@ open class TestPass() {
     @get:Size(min = 1)
     open var code: String = ""
 
+    open var shuffleAnswers = false
+
     @get:ManyToOne
     open lateinit var appUser: AppUser
 
     @get:OneToMany(orphanRemoval = true, cascade = arrayOf(CascadeType.ALL), targetEntity = QuestionAnswer::class, mappedBy = "testPass")
+    @get:OrderBy("num")
     open var questionsWithAnswer: List<QuestionAnswer> = ArrayList()
 
     open var currentQuestionNum = -1
 
     open var created: Date = Date()
 
-    constructor(testCode: String, code: String, user: AppUser, test: Test): this() {
+    constructor(testCode: String, code: String, user: AppUser, test: Test) : this() {
         questionsWithAnswer = test.questions.mapIndexed { i, question ->
             QuestionAnswer(this, i, question)
         }.toMutableList()
-        Collections.shuffle(questionsWithAnswer)
+
+        if (test.shuffleQuestions) {
+            Collections.shuffle(questionsWithAnswer)
+        }
+
         questionsWithAnswer.forEachIndexed { i, questionAnswer -> questionAnswer.num = i }
 
         this.testCode = testCode
         this.testTitle = test.title
         this.testDescription = test.description
         this.testDefaultTime = test.defaultTime
+        this.shuffleAnswers = test.shuffleAnswers
         this.code = code
         this.appUser = user
     }
 
-    fun answer(answers: List<Int>, now: Long = System.currentTimeMillis()) {
+    fun answer(answers: List<Int>, comment: String? = null, now: Long = System.currentTimeMillis()) {
         require(!isDone())
 
-        this.questionsWithAnswer[currentQuestionNum].answer(answers, now)
+        this.questionsWithAnswer[currentQuestionNum].answer(answers, comment, now)
     }
 
-    fun currentQuestionData(shuffle: Boolean, now: Long = System.currentTimeMillis()): QuestionData {
+    fun currentQuestionData(now: Long = System.currentTimeMillis()): QuestionData {
         require(!isDone())
 
         val answer = questionsWithAnswer[currentQuestionNum]
         val answers = answer.question.answers.map { it.text }.withIndex().toMutableList()
-        if (shuffle) {
+        if (shuffleAnswers) {
             Collections.shuffle(answers)
         }
 
@@ -122,6 +130,8 @@ open class QuestionAnswer() {
     @get:Transient
     open var question: Question = Question.Null
 
+    open var comment: String? = null
+
     /**
      * This field is for hibernate. The full json copy of question is stored.
      * It has drawbacks: it'll be hard to compare answers for different questions.
@@ -138,7 +148,7 @@ open class QuestionAnswer() {
     open val time: Int
         @Transient get() = question.timeOverride ?: testPass!!.testDefaultTime
 
-    constructor(testPass: TestPass, originalIndex: Int, question: Question): this() {
+    constructor(testPass: TestPass, originalIndex: Int, question: Question) : this() {
         this.originalIndex = originalIndex
         this.question = question
         this.testPass = testPass
@@ -148,12 +158,13 @@ open class QuestionAnswer() {
         started = Date(now)
     }
 
-    fun answer(answers: List<Int>, now: Long = System.currentTimeMillis()) {
+    fun answer(answers: List<Int>, comment: String? = null, now: Long = System.currentTimeMillis()) {
         require(started != null, { "Must be started before it's answered" })
         require(answers.all { it >= 0 && it < question.answers.size }, { "incorrect answer index" })
 
         this.answered = Date(now)
         this.answers = answers
+        this.comment = comment
     }
 
     fun duration() = if (answered != null) answered!!.time - started!!.time else null
@@ -169,10 +180,11 @@ open class QuestionAnswer() {
 
     companion object {
         val mapper = ObjectMapper()
+
         init {
             mapper.registerModule(KotlinModule())
-//            mapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
-//            mapper.setConfig(mapper.serializationConfig.withView(Views.Serialize::class.java))
+            //            mapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
+            //            mapper.setConfig(mapper.serializationConfig.withView(Views.Serialize::class.java))
         }
     }
 }
