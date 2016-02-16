@@ -25,9 +25,9 @@ title: Sample test
 description: |
   This test shows how to use different features of this stuff.
 
-  ```sql
+  ~```sql
   SELECT * FROM your_knowledge
-  ```
+  ~```
 time: About 2 minutes   # Text description of time estimate
 defaultTime: 65         # Default time for question, in seconds, could be overriden with timeOverride
 shuffleQuestions: true
@@ -41,7 +41,7 @@ questions:
       - +42 # Correct answer is marked with + at the beginning.
       - 12
       - 256
-``
+```
 
 Technologies used
 ----
