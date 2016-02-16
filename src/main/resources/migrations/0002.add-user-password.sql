@@ -1,1 +1,0 @@
-alter table tm.app_user add column password text;

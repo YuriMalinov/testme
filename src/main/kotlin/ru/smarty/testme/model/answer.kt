@@ -63,10 +63,10 @@ open class TestPass() {
         this.appUser = user
     }
 
-    fun answer(answers: List<Int>, comment: String? = null, now: Long = System.currentTimeMillis()) {
+    fun answer(answers: List<Int>, comment: String? = null, textAnswer: String? = null, now: Long = System.currentTimeMillis()) {
         require(!isDone())
 
-        this.questionsWithAnswer[currentQuestionNum].answer(answers, comment, now)
+        this.questionsWithAnswer[currentQuestionNum].answer(answers, comment, textAnswer, now)
     }
 
     fun currentQuestionData(now: Long = System.currentTimeMillis()): QuestionData {
@@ -84,6 +84,7 @@ open class TestPass() {
                 time = time,
                 answers = answers,
                 isMultiAnswer = answer.question.isMultiAnswer(),
+                isOpenQuestion = answer.question.isOpenQuestion(),
                 msLeft = (answer.started!!.time + time * 1000 - now).toInt(),
                 index = currentQuestionNum + 1,
                 total = questionsWithAnswer.size
@@ -102,9 +103,53 @@ open class TestPass() {
     @Transient
     fun isDone() = currentQuestionNum >= questionsWithAnswer.size
 
-    data class QuestionData(val question: String, val time: Int, val isMultiAnswer: Boolean, val answers: List<IndexedValue<String>>, val msLeft: Int, val index: Int, val total: Int)
+    data class QuestionData(
+            val question: String,
+            val time: Int,
+            val isMultiAnswer: Boolean,
+            val isOpenQuestion: Boolean,
+            val answers: List<IndexedValue<String>>,
+            val msLeft: Int,
+            val index: Int,
+            val total: Int)
 
-    fun calculateScore(): Double = questionsWithAnswer.map { it.score() }.sum() * 5 / questionsWithAnswer.size
+    fun calculateScore(): ScoreData {
+        val categoryToScore = HashMap<String, Pair<Double, Double>>()
+        var totalGood = 0.0
+        var totalMax = 0.0
+        var toBeGraded = 0
+
+        for (qa in questionsWithAnswer) {
+            if (qa.question.isOpenQuestion()) {
+                toBeGraded += 1
+                continue
+            }
+
+            val score = qa.score()
+            totalGood += score
+            totalMax += qa.question.weight
+
+            val existing = categoryToScore[qa.question.category]
+            categoryToScore[qa.question.category] = Pair((existing?.first ?: 0.0) + score, (existing?.second ?: 0.0) + score)
+        }
+
+        val categoryScore = categoryToScore.map {
+            val (category, pair) = it;
+            CategoryScore(category, pair.first / Math.max(1.0, pair.second))
+        }.toMutableList()
+
+        Collections.sort(categoryScore, { a, b -> a.category.compareTo(b.category) })
+
+        return ScoreData(totalGood / totalMax, categoryScore, toBeGraded)
+    }
+
+    data class ScoreData(
+            val totalScore: Double,
+            val perCategoryScore: List<CategoryScore>,
+            val questionsToBeGraded: Int
+    )
+
+    data class CategoryScore(val category: String, val score: Double)
 }
 
 @Suppress("unused")
@@ -132,6 +177,8 @@ open class QuestionAnswer() {
 
     open var comment: String? = null
 
+    open var textAnswer: String? = null
+
     /**
      * This field is for hibernate. The full json copy of question is stored.
      * It has drawbacks: it'll be hard to compare answers for different questions.
@@ -158,13 +205,14 @@ open class QuestionAnswer() {
         started = Date(now)
     }
 
-    fun answer(answers: List<Int>, comment: String? = null, now: Long = System.currentTimeMillis()) {
+    fun answer(answers: List<Int>, comment: String? = null, textAnswer: String? = null, now: Long = System.currentTimeMillis()) {
         require(started != null, { "Must be started before it's answered" })
         require(answers.all { it >= 0 && it < question.answers.size }, { "incorrect answer index" })
 
         this.answered = Date(now)
         this.answers = answers
         this.comment = comment
+        this.textAnswer = textAnswer
     }
 
     fun duration() = if (answered != null) answered!!.time - started!!.time else null

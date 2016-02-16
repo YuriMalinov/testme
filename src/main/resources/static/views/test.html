@@ -4,19 +4,26 @@
 <h2>Вопрос #{{ question.questionData.index }}/{{ question.questionData.total}}</h2>
 <markdown text="question.questionData.question"></markdown>
 
-<h2>Варианты ответов:</h2>
-<div class="alert alert-info" ng-show="question.questionData.multiAnswer">Может быть несколько корректных ответов.</div>
-<div class="list-group variants">
-    <a class="list-group-item" ng-repeat="answer in question.questionData.answers" ng-click="selectAnswer(answer)"
-       ng-class="{'list-group-item-success': isSelected(answer)}">
-        <span class="pull-left">{{ $index + 1 }}.&nbsp;</span>
-        <markdown text="answer.value"></markdown>
-    </a>
+<div ng-if="!question.questionData.openQuestion">
+    <h2>Варианты ответов:</h2>
+    <div class="alert alert-info" ng-show="question.questionData.multiAnswer">Может быть несколько корректных ответов.
+    </div>
+    <div class="list-group variants">
+        <a class="list-group-item" ng-repeat="answer in question.questionData.answers" ng-click="selectAnswer(answer)"
+           ng-class="{'list-group-item-success': isSelected(answer)}">
+            <span class="pull-left">{{ $index + 1 }}.&nbsp;</span>
+            <markdown text="answer.value"></markdown>
+        </a>
+    </div>
+</div>
+<div ng-if="question.questionData.openQuestion" class="bottom-buffer">
+    <h2>Ваш ответ:</h2>
+    <textarea class="form-control" ng-model="data.textAnswer" placeholder="Ваш ответ" rows="10"></textarea>
 </div>
 
 <div class="panel panel-info top-buffer" ng-show="addComment">
     <div class="panel-body">
-        <textarea class="form-control" ng-model="comment" placeholder="Ваш комментарий"></textarea>
+        <textarea class="form-control" ng-model="data.comment" placeholder="Ваш комментарий"></textarea>
     </div>
 </div>
 
@@ -24,4 +31,4 @@
         ng-click="answer()">Отправить ответ
 </button>
 
-&nbsp;&nbsp;<a ng-click="addComment = !addComment">некорректный вопрос? дай знать!</a>
+&nbsp;&nbsp;<a ng-click="state.addComment = !state.addComment">некорректный вопрос? дай знать!</a>

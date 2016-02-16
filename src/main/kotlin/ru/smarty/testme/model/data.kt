@@ -41,6 +41,10 @@ class Question {
     @JsonIgnore
     fun isMultiAnswer(): Boolean = forceMultiAnswer || answers.filter { it.correct }.size > 1
 
+    @JsonIgnoreProperties(allowGetters = true)
+    @JsonIgnore
+    fun isOpenQuestion() = answers.size == 0
+
     companion object {
         val Null = Question()
         init {

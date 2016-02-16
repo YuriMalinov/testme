@@ -64,7 +64,7 @@ class TestPassController @Autowired constructor(
 
     data class CodeWithQuestionData(val testName: String, val passCode: String, val done: Boolean, val questionData: TestPass.QuestionData?)
 
-    data class SubmitAnswerRequest(val passCode: String, val answers: List<Int>, val comment: String?)
+    data class SubmitAnswerRequest(val passCode: String, val answers: List<Int>, val comment: String?, val textAnswer: String?)
 
     @ResponseBody
     @RequestMapping("/data/submit-answer", method = arrayOf(RequestMethod.POST))
@@ -77,7 +77,7 @@ class TestPassController @Autowired constructor(
             throw BadRequest("Pass [$passCode] is already done.")
         }
 
-        pass.answer(answers, request.comment)
+        pass.answer(answers, request.comment, request.textAnswer)
         if (!pass.isDone()) {
             pass.startNext()
         }
@@ -88,7 +88,7 @@ class TestPassController @Autowired constructor(
 
     @ResponseBody
     @RequestMapping("/data/score", method = arrayOf(RequestMethod.GET))
-    fun score(passCode: String): Double {
+    fun score(passCode: String): TestPass.ScoreData {
         val pass = findPass(passCode)
 
         if (!pass.isDone()) {

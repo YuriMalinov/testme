@@ -1,7 +1,18 @@
 <h1 class="page-header">Поздравляем, тест окончен</h1>
 
 <div class="alert alert-success">
-    Ваш балл: <b>{{ score }}</b>
+    <p>Ваш балл: <b>{{ score.totalScore | number: 1 }}</b></p>
+
+    По категориям:
+    <div class="list-group">
+        <div class="list-group-item list-group-item-info" ng-repeat="cat in score.perCategoryScore">
+            {{ cat.category }}: <b>{{ cat.score | number: 1 }}</b>
+        </div>
+    </div>
+
+    <div class="alert alert-warning" ng-show="score.questionsToBeGraded">
+        Ожидают оценки: <b>{{ score.questionsToBeGraded }}</b>.
+    </div>
 </div>
 
 <a href="/#start">В начало</a>

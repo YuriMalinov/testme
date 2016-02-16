@@ -47,6 +47,13 @@ app.controller('TestCtrl', ['$scope', '$routeParams', '$location', '$http', '$in
 
     $scope.question = {};
     $scope.selected = {};
+    $scope.data = {
+        comment: null,
+        textAnswer: null
+    };
+    $scope.state = {
+        addComment: false
+    };
 
     $scope.secondsLeft = 0;
     function fetchQuestion() {
@@ -54,9 +61,9 @@ app.controller('TestCtrl', ['$scope', '$routeParams', '$location', '$http', '$in
             $scope.question = response.data;
             $scope.selected = {};
             $scope.secondsLeft = Math.ceil(response.data.questionData.msLeft / 1000);
-            $scope.addCommment = false;
-            $scope.comment = '';
-            console.log(response.data);
+            $scope.state.addCommment = false;
+            $scope.data.comment = null;
+            $scope.data.textAnswer = null;
         });
     }
 
@@ -85,7 +92,15 @@ app.controller('TestCtrl', ['$scope', '$routeParams', '$location', '$http', '$in
                 answers.push(i);
             }
         }
-        $http.post('/data/submit-answer', {passCode: passCode, answers: answers, comment: $scope.comment})
+
+        var data = {
+            passCode: passCode,
+            answers: answers,
+            comment: $scope.data.comment,
+            textAnswer: $scope.data.textAnswer
+        };
+
+        $http.post('/data/submit-answer', data)
             .then(function (result) {
                 if (result.data) {
                     $location.path('/done/' + passCode);
@@ -109,7 +124,7 @@ app.controller('DoneCtrl', ['$scope', '$routeParams', '$http', function ($scope,
         });
 }]);
 
-app.controller('NavBarCtrl', ['$scope', 'UserData', function($scope, UserData) {
+app.controller('NavBarCtrl', ['$scope', 'UserData', function ($scope, UserData) {
     $scope.user = UserData.user;
 }]);
 
