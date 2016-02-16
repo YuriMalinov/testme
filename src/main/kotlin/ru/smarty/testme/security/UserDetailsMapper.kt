@@ -19,7 +19,7 @@ open class UserDetailsMapper @Autowired constructor(
     }
 
     override fun mapUserFromContext(context: DirContextOperations, userName: String, authorities: MutableCollection<out GrantedAuthority>): AppUser {
-        val user = userRepository.findByUserName(userName) orCreate {
+        val user = userRepository.findByLogin(userName) orCreate {
             val appUser = AppUser()
             appUser.login = userName
             appUser.userName = context.getObjectAttribute("cn") as String

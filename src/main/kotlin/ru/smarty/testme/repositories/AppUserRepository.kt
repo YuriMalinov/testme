@@ -6,5 +6,5 @@ import ru.smarty.testme.model.AppUser
 
 @Repository
 interface AppUserRepository : JpaRepository<AppUser, Int> {
-    fun findByUserName(userName: String): AppUser?
+    fun findByLogin(login: String): AppUser?
 }

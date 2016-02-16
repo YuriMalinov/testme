@@ -24,6 +24,9 @@ open class AppUser : UserDetails {
     @get:NotNull
     open var userName: String = ""
 
+    @get:Column(name = "password")
+    open var userPassword: String? = null // Interface clash
+
     @get:Column(name = "is_admin")
     open var isAdmin: Boolean = false
 
@@ -58,7 +61,5 @@ open class AppUser : UserDetails {
 
     @Transient
     @JsonIgnore
-    override fun getPassword(): String {
-        throw UnsupportedOperationException()
-    }
+    override fun getPassword(): String? = userPassword
 }
