@@ -21,7 +21,7 @@ class Question {
     lateinit var question: String
     var forceMultiAnswer: Boolean = false
     var timeOverride: Int? = null
-    var weight = 1
+    var weight = 1.0
     var category = "general"
     /**
      * For multi-answer questions: if true, result = (sum guessed answers - sum false guesses) / sum correct answers in question.

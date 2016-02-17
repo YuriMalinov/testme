@@ -219,8 +219,17 @@ open class QuestionAnswer() {
 
     fun score(): Double {
         // A more clever logic for multianswers might be implemented
-        if (answered != null && duration()!! < (time + 10) * 1000 && question.answers.withIndex().filter { it.value.correct }.map { it.index } == answers) {
-            return 1.0
+        if (answered != null && duration()!! < (time + 10) * 1000) {
+            if (question.advancedWeight) {
+                val correctIndexes = question.answers.withIndex().filter { it.value.correct }.map { it.index }
+                val answersSum = answers.map { if (it in correctIndexes) 1 else -1 }.sum()
+                val missedSum = correctIndexes.filter { it !in answers }.size
+                return Math.max(0.0, (answersSum - missedSum) * 1.0 / correctIndexes.size) * question.weight
+            } else if (question.answers.withIndex().filter { it.value.correct }.map { it.index }.toSet() == answers.toSet()) {
+                return question.weight
+            } else {
+                return 0.0
+            }
         } else {
             return 0.0
         }
