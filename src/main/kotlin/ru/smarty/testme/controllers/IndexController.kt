@@ -3,6 +3,7 @@ package ru.smarty.testme.controllers
 import com.fasterxml.jackson.annotation.JsonView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.GET
@@ -24,7 +25,11 @@ open class IndexController @Autowired constructor(
         private val passRepository: TestPassRepository
 ) {
     @RequestMapping("/")
-    fun index() = "index"
+    fun index(model: Model): String {
+        // Actual "view":
+        model.addAttribute("mainScript", "/js/main.js")
+        return "index"
+    }
 
     @ResponseBody
     @RequestMapping("/data/tests")

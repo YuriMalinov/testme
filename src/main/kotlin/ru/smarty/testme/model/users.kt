@@ -30,21 +30,24 @@ open class AppUser : UserDetails {
     @get:Column(name = "is_admin")
     open var isAdmin: Boolean = false
 
+    @get:Column(name = "is_active")
+    open var isActive: Boolean = true
+
     @Transient
     @JsonIgnore
     override fun getUsername(): String = userName
 
     @Transient
     @JsonIgnore
-    override fun isCredentialsNonExpired(): Boolean = false
+    override fun isCredentialsNonExpired(): Boolean = true
 
     @Transient
     @JsonIgnore
-    override fun isAccountNonExpired(): Boolean = false
+    override fun isAccountNonExpired(): Boolean = true
 
     @Transient
     @JsonIgnore
-    override fun isAccountNonLocked(): Boolean = false
+    override fun isAccountNonLocked(): Boolean = isActive
 
     @Transient
     @JsonIgnore

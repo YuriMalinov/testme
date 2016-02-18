@@ -19,11 +19,6 @@ class TestPassController @Autowired constructor(
         private val testRepository: TestRepository,
         private val passRepository: TestPassRepository
 ) {
-    /**
-     * Dummy class to fool spring MVC to return String.
-     */
-    @Suppress("unused")
-    class Value<T>(val value: T)
 
     class ApplyRequest(val testCode: String)
 

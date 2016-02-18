@@ -4,3 +4,4 @@ target
 *.iml
 application.yml
 tests/*
+src/main/resources/public/external/*

@@ -1,6 +1,7 @@
 package ru.smarty.testme.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonView
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.hibernate.annotations.Type
@@ -35,10 +36,12 @@ open class TestPass() {
     @get:ManyToOne
     open lateinit var appUser: AppUser
 
+    @get:JsonView(Views.FullAdmin::class)
     @get:OneToMany(orphanRemoval = true, cascade = arrayOf(CascadeType.ALL), targetEntity = QuestionAnswer::class, mappedBy = "testPass")
     @get:OrderBy("num")
     open var questionsWithAnswer: List<QuestionAnswer> = ArrayList()
 
+    @get:JsonView(Views.Admin::class)
     open var currentQuestionNum = -1
 
     open var created: Date = Date()
@@ -178,6 +181,8 @@ open class QuestionAnswer() {
     open var comment: String? = null
 
     open var textAnswer: String? = null
+
+    open var mark: Double? = null
 
     /**
      * This field is for hibernate. The full json copy of question is stored.

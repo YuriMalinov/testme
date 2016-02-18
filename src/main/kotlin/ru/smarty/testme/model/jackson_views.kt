@@ -4,5 +4,6 @@ class Views {
     class Detailed
     class Public
     class Admin
+    class FullAdmin
     class Serialize
 }

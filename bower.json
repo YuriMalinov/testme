@@ -1,0 +1,28 @@
+{
+  "name": "testme",
+  "version": "0.0.0",
+  "homepage": "https://github.com/YuriMalinov/testme",
+  "authors": [
+    "Yuri-NoteBook <yurik.m@gmail.com>"
+  ],
+  "description": "App to test your team",
+  "license": "GPL",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "angularjs#~1.5.0",
+    "angular-resource": "~1.5.0",
+    "angular-route": "~1.5.0",
+    "bootstrap": "twbs/bootstrap#~3.3.6",
+    "highlightjs": "~9.1.0",
+    "html5shiv": "~3.7.3",
+    "jquery": "~2.2.0",
+    "marked": "~0.3.5",
+    "respond": "~1.4.2"
+  }
+}

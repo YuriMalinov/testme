@@ -13,3 +13,7 @@ a[ng-click] {
 .bottom-buffer {
     margin-bottom: 20px;
 }
+
+*[ng-cloak] {
+    display: none;
+}
