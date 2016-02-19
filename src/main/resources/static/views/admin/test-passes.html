@@ -7,10 +7,13 @@
         <th>Результат</th>
     </tr>
     <tr ng-repeat="pass in testPasses">
-        <td>{{ pass.user.userName }}</td>
+        <td>{{ pass.appUser.userName }}</td>
         <td>{{ pass.testTitle }}</td>
-        <td>{{ pass.created }}</td>
-        <td>{{ pass.score }}</td>
+        <td>{{ pass.created | date:"dd.MM.yy HH:mm:ss"}}</td>
+        <td>{{ pass.score.totalScore | number:1 }}
+            <span class="label label-info" ng-repeat="cat in pass.score.perCategoryScore">{{ cat.category }}: {{ cat.score }}</span>
+            <span class="label label-danger" ng-show="pass.score.questionsToBeGraded > 0">{{ pass.score.questionsToBeGraded }} надо оценить</span>
+        </td>
     </tr>
 </table>
 <pre>{{ testPasses| json }}</pre>

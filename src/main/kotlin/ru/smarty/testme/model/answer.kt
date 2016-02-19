@@ -169,6 +169,7 @@ open class QuestionAnswer() {
     open var started: Date? = null
     open var answered: Date? = null
 
+    @get:JsonIgnore
     @get:ManyToOne
     open var testPass: TestPass? = null
 

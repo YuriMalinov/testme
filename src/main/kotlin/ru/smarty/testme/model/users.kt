@@ -24,6 +24,7 @@ open class AppUser : UserDetails {
     @get:NotNull
     open var userName: String = ""
 
+    @get:JsonIgnore
     @get:Column(name = "password")
     open var userPassword: String? = null // Interface clash
 

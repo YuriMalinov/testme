@@ -23,14 +23,14 @@ open class AdminController @Autowired constructor(
         private val testPassRepository: TestPassRepository,
         private val answerRepository: QuestionAnswerRepository
 ) {
-    @RequestMapping("/")
+    @RequestMapping("")
     fun index(model: Model): String {
         return "admin"
     }
 
     @ResponseBody
-    @RequestMapping("/test-pass-list", method = arrayOf(GET))
-    open fun testPassList(page: Pageable) = testPassRepository.findAll(page)
+    @RequestMapping("/test-pass", method = arrayOf(GET))
+    open fun testPassList(page: Pageable) = testPassRepository.findAll(page).content
 
     @JsonView(Views.FullAdmin::class)
     @RequestMapping("/test-pass/:id", method = arrayOf(GET))
