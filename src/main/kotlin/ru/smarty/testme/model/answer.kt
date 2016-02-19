@@ -1,5 +1,6 @@
 package ru.smarty.testme.model
 
+import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonView
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -116,7 +117,9 @@ open class TestPass() {
             val index: Int,
             val total: Int)
 
-    fun calculateScore(): ScoreData {
+    @JsonView(Views.Admin::class)
+    @JsonGetter("score")
+    fun score(): ScoreData {
         val categoryToScore = HashMap<String, Pair<Double, Double>>()
         var totalGood = 0.0
         var totalMax = 0.0

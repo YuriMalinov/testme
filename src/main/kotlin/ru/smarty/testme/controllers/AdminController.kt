@@ -25,9 +25,7 @@ open class AdminController @Autowired constructor(
 ) {
     @RequestMapping("/")
     fun index(model: Model): String {
-        // Actual "view":
-        model.addAttribute("mainScript", "/js/admin.js")
-        return "index"
+        return "admin"
     }
 
     @ResponseBody

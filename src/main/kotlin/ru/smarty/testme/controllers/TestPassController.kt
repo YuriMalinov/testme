@@ -20,7 +20,7 @@ class TestPassController @Autowired constructor(
         private val passRepository: TestPassRepository
 ) {
 
-    class ApplyRequest(val testCode: String)
+    data class ApplyRequest(val testCode: String)
 
     @ResponseBody
     @RequestMapping("/data/apply", method = arrayOf(RequestMethod.POST))
@@ -90,6 +90,6 @@ class TestPassController @Autowired constructor(
             throw BadRequest("Pass [$passCode] is not yet done.")
         }
 
-        return pass.calculateScore()
+        return pass.score()
     }
 }

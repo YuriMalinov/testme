@@ -1,0 +1,16 @@
+<h1 class="page-header">Прохождения тестов</h1>
+<table class="table table-condensed table-hover table-striped">
+    <tr>
+        <th>Пользователь</th>
+        <th>Тест</th>
+        <th>Дата</th>
+        <th>Результат</th>
+    </tr>
+    <tr ng-repeat="pass in testPasses">
+        <td>{{ pass.user.userName }}</td>
+        <td>{{ pass.testTitle }}</td>
+        <td>{{ pass.created }}</td>
+        <td>{{ pass.score }}</td>
+    </tr>
+</table>
+<pre>{{ testPasses| json }}</pre>

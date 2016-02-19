@@ -22,24 +22,21 @@ class UserDetailsServiceImpl @Autowired constructor(
         val details = userRepository.findByLogin(userName)
 
         val logger = LoggerFactory.getLogger(this.javaClass)
-        logger.info("Checking $userName, $details found, checkedEmptiness = $checkedEmptiness")
+        logger.debug("Checking $userName, $details found, checkedEmptiness = $checkedEmptiness")
         // Automatically initialize user if needed
         if (details == null && !checkedEmptiness && userName == "admin") {
-            logger.info("!!")
             synchronized(checkNewLock) {
                 val count = userRepository.count()
                 checkedEmptiness = true
-                logger.info("count = $count")
 
                 if (count == 0L) {
+                    logger.info("Empty database: creating user 'admin; with password 'admin'.")
                     val admin = AppUser().apply {
                         this.userName = "Admin"
                         login = "admin"
                         userPassword = passwordEncoder.encode("admin")
                         isAdmin = true
                     }
-
-                    logger.info("admin = $admin")
 
                     return userRepository.save(admin)
                 }

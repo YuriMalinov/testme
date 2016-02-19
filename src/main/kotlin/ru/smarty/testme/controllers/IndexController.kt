@@ -25,11 +25,7 @@ open class IndexController @Autowired constructor(
         private val passRepository: TestPassRepository
 ) {
     @RequestMapping("/")
-    fun index(model: Model): String {
-        // Actual "view":
-        model.addAttribute("mainScript", "/js/main.js")
-        return "index"
-    }
+    fun index() = "index"
 
     @ResponseBody
     @RequestMapping("/data/tests")
