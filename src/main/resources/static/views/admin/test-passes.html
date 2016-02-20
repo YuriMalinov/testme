@@ -8,7 +8,7 @@
     </tr>
     <tr ng-repeat="pass in testPasses">
         <td>{{ pass.appUser.userName }}</td>
-        <td>{{ pass.testTitle }}</td>
+        <td><a ng-href="#/test-pass/{{ pass.id }}/">{{ pass.testTitle }}</a></td>
         <td>{{ pass.created | date:"dd.MM.yy HH:mm:ss"}}</td>
         <td>{{ pass.score.totalScore | number:1 }}
             <span class="label label-info" ng-repeat="cat in pass.score.perCategoryScore">{{ cat.category }}: {{ cat.score }}</span>
@@ -16,4 +16,4 @@
         </td>
     </tr>
 </table>
-<pre>{{ testPasses| json }}</pre>
+<!--<pre>{{ testPasses| json }}</pre>-->

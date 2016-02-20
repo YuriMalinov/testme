@@ -1,0 +1,11 @@
+.question-table p {
+    margin: 0;
+}
+
+.question-table .badge {
+    margin: 10px 0;
+}
+
+.question-table .selected-answer td {
+    background-color: lightyellow;
+}

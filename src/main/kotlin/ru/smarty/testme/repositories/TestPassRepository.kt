@@ -7,4 +7,6 @@ import ru.smarty.testme.model.TestPass
 @Repository
 interface TestPassRepository : JpaRepository<TestPass, Int> {
     fun findByCode(code: String): TestPass?
+
+    fun findAllByOrderByIdDesc(): List<TestPass>
 }

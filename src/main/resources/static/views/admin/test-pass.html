@@ -1,0 +1,79 @@
+<a href="#/test-passes" class="btn btn-default pull-right">Назад</a>
+
+<h1>{{ testPass.appUser.userName }}: {{ testPass.testTitle }}</h1>
+
+<markdown text="testPass.testDescription"></markdown>
+
+<table class="table table-hover question-table">
+    <tr ng-repeat-start="a in testPass.questionsWithAnswer" ng-class="{'selected-answer': selectedAnswerId == a.id}">
+        <td ng-click="toggleAnswer(a)" width="1%">
+            <span class="label label-info">{{ a.question.category }}</span>
+        </td>
+        <td ng-click="toggleAnswer(a)">
+            <markdown text="a.question.question"></markdown>
+        </td>
+        <td ng-click="toggleAnswer(a)">
+            <span class="label" ng-show="a.question.answers.length || a.mark !== null" ng-class="{
+                'label-success': a.score == a.question.weight,
+                'label-danger': a.score == 0,
+                'label-warning': a.score > 0 && a.score < a.question.weight
+            }">{{ a.score | number: 1 }} / {{ a.question.weight }}</span>
+            <span class="label label-primary"
+                  ng-hide="a.question.answers.length || a.mark !== null">Требуется оценка</span>
+            <span class="label label-danger" ng-show="a.timeout">Timeout!!</span>
+            <span class="label label-danger" ng-show="!a.answered">Не отвечен</span>
+        </td>
+    </tr>
+    <tr ng-repeat-end="a in testPass.questionsWithAnswer" ng-if="selectedAnswerId == a.id" class="selected-answer">
+        <td colspan="10">
+            <div ng-if="a.question.answers.length > 0">
+                <span ng-show="a.question.advancedWeight" class="badge">Оцениваются частичные ответы</span>
+                <div class="list-group">
+                    <div class="list-group-item" ng-repeat="answer in a.question.answers"
+                         ng-class="{ 'list-group-item-success': answer.correct }">
+                    <span class="label pull-left right-buffer-small"
+                          ng-show="a.answers.indexOf($index) != -1"
+                          ng-class="{'label-success': answer.correct, 'label-danger': !answer.correct}"
+                    >Ответ</span>
+                        <markdown text="answer.text"></markdown>
+                    </div>
+                </div>
+            </div>
+
+
+            <div ng-if="a.question.answers.length == 0">
+                <span ng-show="a.question.advancedWeight" class="badge">Требуется оценка</span>
+                <div class="list-group">
+                    <a class="list-group-item" ng-repeat="criteria in a.question.criteria"
+                       ng-class="{ 'list-group-item-success': selectedCriterias[a.id][$index] }"
+                       ng-click="toggleCriteria(a, $index)">
+                        <markdown text="criteria.text"></markdown>
+                    </a>
+                </div>
+                <div class="row">
+                    <div class="col-sm-1">
+                        <input class="form-control" type="text" ng-model="a.mark" placeholder="Оценка">
+                    </div>
+                    <div class="col-sm-2">
+                        <a ng-click="grade(a)" class="btn btn-primary">Оценить</a>
+                    </div>
+                </div>
+
+            </div>
+        </td>
+    </tr>
+</table>
+
+<h3>Оценка:</h3>
+<table class="table table-auto-width">
+    <tr>
+        <td><span class="label label-success">Общая</span></td>
+        <td>{{ testPass.score.totalScore | number:1 }}</td>
+    </tr>
+    <tr ng-repeat="cat in testPass.score.perCategoryScore">
+        <td><span class="label label-info">{{ cat.category }}</span></td>
+        <td>{{ cat.score | number:1 }}</td>
+    </tr>
+</table>
+
+<!--<pre>{{ testPass | json }}</pre>-->

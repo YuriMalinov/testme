@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonView
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
@@ -40,6 +41,7 @@ open class TestPass() {
     @get:JsonView(Views.FullAdmin::class)
     @get:OneToMany(orphanRemoval = true, cascade = arrayOf(CascadeType.ALL), targetEntity = QuestionAnswer::class, mappedBy = "testPass")
     @get:OrderBy("num")
+    @get:BatchSize(size = 100)
     open var questionsWithAnswer: List<QuestionAnswer> = ArrayList()
 
     @get:JsonView(Views.Admin::class)
@@ -141,12 +143,12 @@ open class TestPass() {
 
         val categoryScore = categoryToScore.map {
             val (category, pair) = it;
-            CategoryScore(category, pair.first / Math.max(1.0, pair.second))
+            CategoryScore(category, 5.0 * pair.first / Math.max(1.0, pair.second))
         }.toMutableList()
 
         Collections.sort(categoryScore, { a, b -> a.category.compareTo(b.category) })
 
-        return ScoreData(totalGood / totalMax, categoryScore, toBeGraded)
+        return ScoreData(5.0 * totalGood / totalMax, categoryScore, toBeGraded)
     }
 
     data class ScoreData(
@@ -224,11 +226,20 @@ open class QuestionAnswer() {
         this.textAnswer = textAnswer
     }
 
+    @JsonView(Views.FullAdmin::class)
+    @JsonGetter("duration")
     fun duration() = if (answered != null) answered!!.time - started!!.time else null
 
+    @JsonGetter
+    fun timeout() = answered != null && duration()!! > (time + 10) * 1000
+
+    @JsonView(Views.FullAdmin::class)
+    @JsonGetter("score")
     fun score(): Double {
         // A more clever logic for multianswers might be implemented
-        if (answered != null && duration()!! < (time + 10) * 1000) {
+        if (question.answers.size == 0) {
+            return mark ?: 0.0
+        } else if (answered != null && !timeout()) {
             if (question.advancedWeight) {
                 val correctIndexes = question.answers.withIndex().filter { it.value.correct }.map { it.index }
                 val answersSum = answers.map { if (it in correctIndexes) 1 else -1 }.sum()

@@ -6,7 +6,7 @@ app.config(['$routeProvider', function ($routeProvider) {
     }).when('/test-passes', {
         templateUrl: '/views/admin/test-passes.html',
         controller: 'TestPassesCtrl'
-    }).when('/test-pass/:passCode', {
+    }).when('/test-pass/:id', {
         templateUrl: '/views/admin/test-pass.html',
         controller: 'TestPassCtrl'
     }).otherwise({
@@ -42,17 +42,17 @@ app.controller('TestPassesCtrl', ['$scope', '$location', 'TestPass', function ($
 }]);
 
 app.controller('TestPassCtrl', ['$scope', '$routeParams', 'TestPass', 'QuestionAnswer', function ($scope, $routeParams, TestPass, QuestionAnswer) {
-    $scope.testPass = TestPass.get($routeParams.id);
-    $scope.marks = {};
+    $scope.testPass = TestPass.get({id: $routeParams.id});
     $scope.selectedCriterias = {};
+    $scope.selectedAnswerId = null;
 
-    $scope.toggleCriteria = function (answer, criteria) {
+    $scope.toggleCriteria = function (answer, criteriaIndex) {
         var criterias = $scope.selectedCriterias;
         if (criterias[answer.id] === undefined) {
             criterias[answer.id] = {};
         }
 
-        criterias[answer.id][criteria.id] = !criterias[answer.id][criteria.id];
+        criterias[answer.id][criteriaIndex] = !criterias[answer.id][criteriaIndex];
 
         var count = 0;
         for (var x in criterias[answer.id]) {
@@ -60,19 +60,27 @@ app.controller('TestPassCtrl', ['$scope', '$routeParams', 'TestPass', 'QuestionA
                 count++;
             }
         }
+        answer.mark = answer.question.weight * count / answer.question.criteria.length;
+    };
 
-        $scope.marks[answer.id] = answer.question.weight * count / answer.question.criteria.length;
+    $scope.toggleAnswer = function (answer) {
+        if ($scope.selectedAnswerId === answer.id) {
+            $scope.selectedAnswerId = null;
+        } else {
+            $scope.selectedAnswerId = answer.id;
+        }
     };
 
 
     $scope.grade = function (answer) {
-        if ($scope.marks[answer.id] === undefined) {
+        if (answer.mark === null) {
             alert('Please select your mark');
             return;
         }
 
-        QuestionAnswer.grade({id: answer.id, mark: $scope.marks[answer.id]}, function(answer) {
-            $scope.marks[answer.id] = answer.mark;
+        QuestionAnswer.grade({id: answer.id, mark: answer.mark}, function (a) {
+            angular.extend(answer, a);
+            $scope.toggleAnswer(answer);
         });
     };
 }]);

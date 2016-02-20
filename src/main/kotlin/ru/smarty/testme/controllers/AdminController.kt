@@ -8,10 +8,12 @@ import org.springframework.stereotype.Controller
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.GET
 import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.ResponseBody
+import ru.smarty.testme.model.QuestionAnswer
 import ru.smarty.testme.model.Views
 import ru.smarty.testme.repositories.QuestionAnswerRepository
 import ru.smarty.testme.repositories.TestPassRepository
@@ -28,24 +30,25 @@ open class AdminController @Autowired constructor(
         return "admin"
     }
 
-    @ResponseBody
+    @JsonView(Views.Admin::class)
     @RequestMapping("/test-pass", method = arrayOf(GET))
-    open fun testPassList(page: Pageable) = testPassRepository.findAll(page).content
+    @ResponseBody
+    open fun testPassList() = testPassRepository.findAllByOrderByIdDesc()
 
     @JsonView(Views.FullAdmin::class)
-    @RequestMapping("/test-pass/:id", method = arrayOf(GET))
+    @RequestMapping("/test-pass/{id}", method = arrayOf(GET))
     @ResponseBody
     open fun testPass(@PathVariable("id") id: Int) = testPassRepository.findOne(id)
 
-    data class GradeRequest(val answerId: Int, val mark: Double)
+
+    data class GradeAnswerRequest(val id: Int, val mark: Double?)
 
     @Transactional
-    @RequestMapping("/grade-answer", method = arrayOf(POST))
-    open fun gradeAnswer(grade: GradeRequest): Value<String> {
-        val answer = answerRepository.getOne(grade.answerId) ?: throw NotFound("Can't find QuestionAnswer with id [${grade.answerId}]")
-        answer.mark = grade.mark
-        answerRepository.save(answer)
-
-        return Value("OK")
+    @RequestMapping("/question-answer/{id}", method = arrayOf(POST), params = arrayOf("grade=true"))
+    @ResponseBody
+    open fun gradeAnswer(@RequestBody grade: GradeAnswerRequest): QuestionAnswer {
+        val answer = answerRepository.getOne(grade.id) ?: throw NotFound("Can't find QuestionAnswer with id [${grade.id}]")
+        answer.mark = if (grade.mark == null) null else Math.min(grade.mark, answer.question.weight * 1.0)
+        return answerRepository.save(answer)
     }
 }

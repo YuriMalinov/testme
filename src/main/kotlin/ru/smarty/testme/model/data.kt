@@ -31,16 +31,18 @@ class Question {
     /**
      * If not empty then answers must be empty. It means open question. Criteria describes how to check answers.
      */
-    @JsonView(Views.Detailed::class, Views.Serialize::class)
+    @JsonView(Views.Detailed::class, Views.FullAdmin::class)
     var criteria: List<Criteria> = ArrayList()
 
-    @JsonView(Views.Detailed::class, Views.Serialize::class)
+    @JsonView(Views.Detailed::class, Views.FullAdmin::class)
     var answers: List<AnswerVariant> = ArrayList()
 
     @JsonIgnoreProperties(allowGetters = true)
     @JsonIgnore
     fun isMultiAnswer(): Boolean = forceMultiAnswer || answers.filter { it.correct }.size > 1
 
+
+    @JsonView(Views.Detailed::class, Views.FullAdmin::class)
     @JsonIgnoreProperties(allowGetters = true)
     @JsonIgnore
     fun isOpenQuestion() = answers.size == 0
@@ -56,7 +58,7 @@ class Question {
 class Criteria(var text: String) {
 }
 
-class AnswerVariant(val text: String, @JsonView(Views.Admin::class, Views.Serialize::class) val correct: Boolean) {
+class AnswerVariant(val text: String, @JsonView(Views.Admin::class) val correct: Boolean) {
     constructor(value: String) : this(value.trimStart('+'), value.startsWith('+')) {
     }
 }

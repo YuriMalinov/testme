@@ -2,8 +2,7 @@ package ru.smarty.testme.model
 
 class Views {
     class Detailed
-    class Public
-    class Admin
-    class FullAdmin
-    class Serialize
+    open class Public
+    open class Admin : Public()
+    class FullAdmin : Admin()
 }
