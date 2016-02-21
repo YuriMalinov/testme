@@ -19,7 +19,8 @@
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -35,7 +36,8 @@
                 <li><a href="/admin" ng-show="user.admin" ng-cloak>Админка</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">{{ user.userName }}</a></li>
+                <li><a href="#">{{ user.fullName }}</a></li>
+                <li><a href="/logout">Выйти</a></li>
             </ul>
         </div><!-- /.navbar-collapse -->
     </div>

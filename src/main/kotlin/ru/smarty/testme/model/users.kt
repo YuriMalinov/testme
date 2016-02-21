@@ -18,7 +18,7 @@ open class AppUser : UserDetails {
 
     @get:Size(min = 1)
     @get:NotNull
-    open var login: String = ""
+    open var fullName: String = ""
 
     @get:Size(min = 1)
     @get:NotNull

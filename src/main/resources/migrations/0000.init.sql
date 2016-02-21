@@ -1,8 +1,8 @@
 create schema tm;
 create table tm.app_user (
   id serial primary key,
-  login text not null,
   user_name text not null,
+  full_name text not null,
   is_admin boolean not null default false
 );
 
@@ -33,3 +33,5 @@ create table tm.question_answer (
   mark double precision,
   comment text
 );
+
+create table persistent_logins (username varchar(64) not null, series varchar(64) primary key, token varchar(64) not null, last_used timestamp not null);

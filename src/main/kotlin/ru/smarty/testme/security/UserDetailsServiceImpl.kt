@@ -14,12 +14,12 @@ import java.util.concurrent.locks.ReentrantLock
 class UserDetailsServiceImpl @Autowired constructor(
         private val userRepository: AppUserRepository,
         private val passwordEncoder: BCryptPasswordEncoder
-) : UserDetailsService{
+) : UserDetailsService {
     private var checkedEmptiness = false
     private val checkNewLock = ReentrantLock()
 
     override fun loadUserByUsername(userName: String): UserDetails? {
-        val details = userRepository.findByLogin(userName)
+        val details = userRepository.findByUserName(userName)
 
         val logger = LoggerFactory.getLogger(this.javaClass)
         logger.debug("Checking $userName, $details found, checkedEmptiness = $checkedEmptiness")
@@ -32,8 +32,8 @@ class UserDetailsServiceImpl @Autowired constructor(
                 if (count == 0L) {
                     logger.info("Empty database: creating user 'admin; with password 'admin'.")
                     val admin = AppUser().apply {
-                        this.userName = "Admin"
-                        login = "admin"
+                        fullName = "Admin"
+                        this.userName = "admin"
                         userPassword = passwordEncoder.encode("admin")
                         isAdmin = true
                     }

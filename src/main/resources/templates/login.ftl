@@ -33,9 +33,6 @@
         </#if>
         <input type="text" class="form-control" name="username" placeholder="логин" required="" autofocus=""/>
         <input type="password" class="form-control" name="password" placeholder="пароль" required=""/>
-        <#--<label class="checkbox">-->
-            <#--<input type="checkbox" value="remember-me" id="rememberMe" name="rememberMe"> Запомнить меня-->
-        <#--</label>-->
         <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
     </form>
 </div>

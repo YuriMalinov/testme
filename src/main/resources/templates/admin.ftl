@@ -38,7 +38,7 @@
                 <li><a href="/admin#users">Пользователи</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">{{ user.userName }}</a></li>
+                <li><a href="#">{{ user.fullName }}</a></li>
             </ul>
         </div><!-- /.navbar-collapse -->
     </div>
