@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.configurers
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices
 import org.springframework.stereotype.Service
 import ru.smarty.testme.security.UserDetailsMapper
 import ru.smarty.testme.security.UserDetailsServiceImpl
@@ -17,8 +18,14 @@ import ru.smarty.testme.security.UserDetailsServiceImpl
 open class SecurityConfig : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
+                .antMatchers("/external/**", "/css/**", "/js/**").permitAll()
                 .anyRequest().fullyAuthenticated()
-                .and().httpBasic()
+                .and().formLogin()
+                .apply {
+                    loginPage("/login")
+                    permitAll()
+                }
+                .and().logout().permitAll()
                 .and().csrf().disable()
     }
 
@@ -45,13 +52,12 @@ open class SecurityConfig : WebSecurityConfigurerAdapter() {
                     auth.ldapAuthentication()
                             .userSearchBase(userSearchBase)
                             .userSearchFilter(userSearchFilter)
-
                             .contextSource()
                             .url(url)
                             .managerDn(managerDn)
                             .managerPassword(managerPassword)
-                    .and()
-                    .userDetailsContextMapper(userDetailsMapper)
+                            .and()
+                            .userDetailsContextMapper(userDetailsMapper)
                 }
             } else {
                 auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder())
