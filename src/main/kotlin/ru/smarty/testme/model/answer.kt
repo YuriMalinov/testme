@@ -128,7 +128,7 @@ open class TestPass() {
         var toBeGraded = 0
 
         for (qa in questionsWithAnswer) {
-            if (qa.question.isOpenQuestion()) {
+            if (qa.question.isOpenQuestion() && qa.mark == null) {
                 toBeGraded += 1
                 continue
             }
@@ -138,7 +138,7 @@ open class TestPass() {
             totalMax += qa.question.weight
 
             val existing = categoryToScore[qa.question.category]
-            categoryToScore[qa.question.category] = Pair((existing?.first ?: 0.0) + score, (existing?.second ?: 0.0) + score)
+            categoryToScore[qa.question.category] = Pair((existing?.first ?: 0.0) + score, (existing?.second ?: 0.0) + qa.question.weight)
         }
 
         val categoryScore = categoryToScore.map {
