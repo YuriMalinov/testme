@@ -43,10 +43,10 @@
 
 
             <div ng-if="a.question.answers.length == 0">
-                <span ng-show="a.question.advancedWeight" class="badge">Требуется оценка</span>
+                <span ng-show="a.question.mark == null" class="badge">Требуется оценка</span>
                 <div class="list-group">
                     <a class="list-group-item" ng-repeat="criteria in a.question.criteria"
-                       ng-class="{ 'list-group-item-success': selectedCriterias[a.id][$index] }"
+                       ng-class="{ 'list-group-item-success': a.criteriasMet.indexOf($index) >= 0 }"
                        ng-click="toggleCriteria(a, $index)">
                         <markdown text="criteria.text"></markdown>
                     </a>

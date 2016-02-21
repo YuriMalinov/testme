@@ -178,6 +178,10 @@ open class QuestionAnswer() {
 
     @get:Type(type = "ru.smarty.testme.utils.IntArrayUserType")
     open var answers: List<Int> = emptyList()
+
+    @get:Type(type = "ru.smarty.testme.utils.IntArrayUserType")
+    open var criteriasMet: List<Int> = emptyList()
+
     open var originalIndex: Int = 0
 
     open var num: Int = 0

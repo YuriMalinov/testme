@@ -42,7 +42,7 @@ open class AdminController @Autowired constructor(
     open fun testPass(@PathVariable("id") id: Int) = testPassRepository.findOne(id)
 
 
-    data class GradeAnswerRequest(val id: Int, val mark: Double?)
+    data class GradeAnswerRequest(val id: Int, val mark: Double?, val criteriasMet: List<Int>)
 
     @Transactional
     @RequestMapping("/question-answer/{id}", method = arrayOf(POST), params = arrayOf("grade=true"))
@@ -51,6 +51,7 @@ open class AdminController @Autowired constructor(
         val answer = answerRepository.getOne(grade.id) ?: throw NotFound("Can't find QuestionAnswer with id [${grade.id}]")
         answer.mark = if (grade.mark == null) null else Math.min(grade.mark, answer.question.weight * 1.0)
         answer.markedBy = currentUser()
+        answer.criteriasMet = grade.criteriasMet
         return answerRepository.save(answer)
     }
 }

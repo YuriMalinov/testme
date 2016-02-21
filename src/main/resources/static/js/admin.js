@@ -47,20 +47,14 @@ app.controller('TestPassCtrl', ['$scope', '$routeParams', 'TestPass', 'QuestionA
     $scope.selectedAnswerId = null;
 
     $scope.toggleCriteria = function (answer, criteriaIndex) {
-        var criterias = $scope.selectedCriterias;
-        if (criterias[answer.id] === undefined) {
-            criterias[answer.id] = {};
+        var index = answer.criteriasMet.indexOf(criteriaIndex);
+        if (index == -1) {
+            answer.criteriasMet.push(criteriaIndex);
+        } else {
+            answer.criteriasMet.splice(index, 1);
         }
 
-        criterias[answer.id][criteriaIndex] = !criterias[answer.id][criteriaIndex];
-
-        var count = 0;
-        for (var x in criterias[answer.id]) {
-            if (criterias[answer.id][x]) {
-                count++;
-            }
-        }
-        answer.mark = answer.question.weight * count / answer.question.criteria.length;
+        answer.mark = answer.question.weight * answer.criteriasMet.length / answer.question.criteria.length;
     };
 
     $scope.toggleAnswer = function (answer) {
@@ -78,7 +72,7 @@ app.controller('TestPassCtrl', ['$scope', '$routeParams', 'TestPass', 'QuestionA
             return;
         }
 
-        QuestionAnswer.grade({id: answer.id, mark: answer.mark}, function (a) {
+        QuestionAnswer.grade({id: answer.id, mark: answer.mark, criteriasMet: answer.criteriasMet}, function (a) {
             angular.extend(answer, a);
             $scope.toggleAnswer(answer);
         });

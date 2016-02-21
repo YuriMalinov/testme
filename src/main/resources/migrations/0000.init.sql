@@ -29,6 +29,7 @@ create table tm.question_answer (
   started timestamp,
   answered timestamp,
   answers int[],
+  criterias_met int[],
   text_answer text,
   mark double precision,
   marked_by_id int references tm.app_user(id) on delete set null,

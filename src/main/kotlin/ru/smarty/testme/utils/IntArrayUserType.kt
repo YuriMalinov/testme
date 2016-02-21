@@ -20,12 +20,10 @@ class IntArrayUserType : UserType {
             names: Array<String>,
             session: SessionImplementor,
             owner: Any): List<Int>? {
-        if (resultSet.wasNull()) {
-            return ArrayList()
-        }
+        val sqlArray = resultSet.getArray(names[0]) ?: return ArrayList()
 
         @Suppress("UNCHECKED_CAST")
-        val array = resultSet.getArray(names[0]).array as Array<Int>
+        val array = sqlArray.array as Array<Int>
         return arrayListOf(*array)
     }
 
