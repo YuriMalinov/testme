@@ -3,6 +3,16 @@
 </h1>
 <ul class="list-group">
     <li class="list-group-item" ng-repeat="test in tests">
+        <div class="well well-sm pull-right" ng-if="test.previousPasses.length > 0">
+            <div>Последнее прохождение: {{ test.previousPasses[0].created| date: "dd.MM.yy HH:mm" }}</div>
+            <div>Общий балл: {{ test.previousPasses[0].score.totalScore }}</div>
+            <div ng-repeat="cat in test.previousPasses[0].score.perCategoryScore">
+                {{ cat.category }}: {{ cat.score }}
+            </div>
+            <div ng-show="test.previousPasses[0].score.questionsToBeGraded > 0">
+                Ожидают оценки: {{ test.previousPasses[0].score.questionsToBeGraded }}
+            </div>
+        </div>
         <h3>{{ test.test.title }}</h3>
         <div><a class="btn btn-info" ng-click="toggleApply(test)">Подробнее</a> {{ test.test.time }}</div>
         <div class="panel panel-primary" ng-if="show[test.code]">

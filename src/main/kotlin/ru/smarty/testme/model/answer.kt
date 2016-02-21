@@ -119,7 +119,7 @@ open class TestPass() {
             val index: Int,
             val total: Int)
 
-    @JsonView(Views.Admin::class)
+    @JsonView(Views.Admin::class, Views.Public::class)
     @JsonGetter("score")
     fun score(): ScoreData {
         val categoryToScore = HashMap<String, Pair<Double, Double>>()

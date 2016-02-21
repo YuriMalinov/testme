@@ -30,9 +30,13 @@ open class IndexController @Autowired constructor(
     @ResponseBody
     @RequestMapping("/data/tests")
     @JsonView(Views.Public::class)
-    fun tests() = testRepository.tests.map { TestWithCode(it.key, it.value) }
+    fun tests(): List<TestData> {
+        val passes = passRepository.findByAppUser(currentUser()).groupBy { it.testCode }
 
-    data class TestWithCode(val code: String, val test: Test)
+        return testRepository.tests.map { TestData(it.key, it.value, passes[it.key] ?: emptyList()) }
+    }
+
+    data class TestData(val code: String, val test: Test, val previousPasses: List<TestPass>)
 
     @ResponseBody
     @RequestMapping("/data/user")
