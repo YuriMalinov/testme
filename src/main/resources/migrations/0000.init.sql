@@ -31,6 +31,7 @@ create table tm.question_answer (
   answers int[],
   text_answer text,
   mark double precision,
+  marked_by_id int references tm.app_user(id) on delete set null,
   comment text
 );
 

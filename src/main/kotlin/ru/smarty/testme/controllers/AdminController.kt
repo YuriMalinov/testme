@@ -17,6 +17,7 @@ import ru.smarty.testme.model.QuestionAnswer
 import ru.smarty.testme.model.Views
 import ru.smarty.testme.repositories.QuestionAnswerRepository
 import ru.smarty.testme.repositories.TestPassRepository
+import ru.smarty.testme.utils.currentUser
 
 @Controller
 @Secured("ROLE_ADMIN")
@@ -49,6 +50,7 @@ open class AdminController @Autowired constructor(
     open fun gradeAnswer(@RequestBody grade: GradeAnswerRequest): QuestionAnswer {
         val answer = answerRepository.getOne(grade.id) ?: throw NotFound("Can't find QuestionAnswer with id [${grade.id}]")
         answer.mark = if (grade.mark == null) null else Math.min(grade.mark, answer.question.weight * 1.0)
+        answer.markedBy = currentUser()
         return answerRepository.save(answer)
     }
 }

@@ -173,6 +173,7 @@ open class QuestionAnswer() {
 
     @get:JsonIgnore
     @get:ManyToOne
+    @get:BatchSize(size = 100)
     open var testPass: TestPass? = null
 
     @get:Type(type = "ru.smarty.testme.utils.IntArrayUserType")
@@ -189,6 +190,10 @@ open class QuestionAnswer() {
     open var textAnswer: String? = null
 
     open var mark: Double? = null
+
+    @get:ManyToOne
+    @get:BatchSize(size = 100)
+    open var markedBy: AppUser? = null
 
     /**
      * This field is for hibernate. The full json copy of question is stored.

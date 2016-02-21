@@ -22,6 +22,7 @@
                   ng-hide="a.question.answers.length || a.mark !== null">Требуется оценка</span>
             <span class="label label-danger" ng-show="a.timeout">Timeout!!</span>
             <span class="label label-danger" ng-show="!a.answered">Не отвечен</span>
+            <span class="label label-info" ng-show="a.question.answers.length == 0">Открытый</span>
         </td>
     </tr>
     <tr ng-repeat-end="a in testPass.questionsWithAnswer" ng-if="selectedAnswerId == a.id" class="selected-answer">
@@ -57,6 +58,7 @@
                     <div class="col-sm-2">
                         <a ng-click="grade(a)" class="btn btn-primary">Оценить</a>
                     </div>
+                    <div class="col-sm-6" ng-show="a.markedBy">Оценил {{ a.markedBy.fullName }}</div>
                 </div>
 
             </div>
