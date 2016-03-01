@@ -10,8 +10,8 @@ import javax.persistence.CascadeType.ALL
 @Entity
 @Table(name = "test", schema = "tm")
 open class Test {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @get:Id
+    @get:GeneratedValue(strategy = GenerationType.IDENTITY)
     open var id: Int = 0
 
     open lateinit var title: String
@@ -23,7 +23,7 @@ open class Test {
 
     open var created: Date = Date()
 
-    @OneToMany(orphanRemoval = true, cascade = arrayOf(ALL))
+    @get:OneToMany(orphanRemoval = true, cascade = arrayOf(ALL), mappedBy = "test")
     @JsonView(Views.Detailed::class)
     open var questions: List<Question> = arrayListOf()
 
@@ -38,11 +38,12 @@ open class Test {
 @Entity
 @Table(name = "question", schema = "tm")
 open class Question {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @get:Id
+    @get:GeneratedValue(strategy = GenerationType.IDENTITY)
     open var id: Int = 0
 
-    @ManyToOne
+    @JsonIgnore
+    @get:ManyToOne
     open lateinit var test: Test
 
     open lateinit var question: String
@@ -58,22 +59,24 @@ open class Question {
     /**
      * If not empty then answers must be empty. It means open question. Criteria describes how to check answers.
      */
-    @OneToMany(orphanRemoval = true, cascade = arrayOf(ALL))
-    @JsonView(Views.Detailed::class, Views.FullAdmin::class)
+    @get:OneToMany(orphanRemoval = true, cascade = arrayOf(ALL), mappedBy = "question")
+    @get:JsonView(Views.Detailed::class, Views.FullAdmin::class)
     open var criteria: List<Criteria> = ArrayList()
 
-    @OneToMany(orphanRemoval = true, cascade = arrayOf(ALL))
-    @JsonView(Views.Detailed::class, Views.FullAdmin::class)
+    @get:OneToMany(orphanRemoval = true, cascade = arrayOf(ALL), mappedBy = "question")
+    @get:JsonView(Views.Detailed::class, Views.FullAdmin::class)
     open var answers: List<AnswerVariant> = ArrayList()
 
     @JsonIgnoreProperties(allowGetters = true)
     @JsonIgnore
+    @Transient
     fun isMultiAnswer(): Boolean = forceMultiAnswer || answers.filter { it.correct }.size > 1
 
 
     @JsonView(Views.Detailed::class, Views.FullAdmin::class)
     @JsonIgnoreProperties(allowGetters = true)
     @JsonIgnore
+    @Transient
     fun isOpenQuestion() = answers.size == 0
 
     fun rebind() {
@@ -94,11 +97,12 @@ open class Question {
 @Entity
 @Table(name = "question_criteria", schema = "tm")
 open class Criteria() {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @get:Id
+    @get:GeneratedValue(strategy = GenerationType.IDENTITY)
     open var id: Int = 0
 
-    @ManyToOne
+    @JsonIgnore
+    @get:ManyToOne
     open lateinit var question: Question
 
     open lateinit var text: String
@@ -112,11 +116,12 @@ open class Criteria() {
 @Entity
 @Table(name = "question_answer_variant", schema = "tm")
 open class AnswerVariant() {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @get:Id
+    @get:GeneratedValue(strategy = GenerationType.IDENTITY)
     open var id: Int = 0
 
-    @ManyToOne
+    @JsonIgnore
+    @get:ManyToOne
     open lateinit var question: Question
 
     open lateinit var text: String

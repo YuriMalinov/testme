@@ -30,12 +30,12 @@ app.controller('StartCtrl', ['$scope', '$resource', '$http', '$location', '$wind
     $scope.show = {};
 
     $scope.toggleApply = function (test) {
-        $scope.show[test.code] = !$scope.show[test.code];
+        $scope.show[test.id] = !$scope.show[test.id];
     };
 
     $scope.apply = function (test) {
         $http.post('/data/apply', {
-            testCode: test.code
+            testId: test.id
         }).then(function (result) {
             $location.path('/test/' + result.data.value)
         });

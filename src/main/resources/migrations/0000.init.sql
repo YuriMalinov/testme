@@ -4,7 +4,7 @@ create table tm.app_user (
   id serial primary key,
   user_name text not null,
   full_name text not null,
-  password text not null,
+  password text,
   is_active boolean not null default true,
   is_admin boolean not null default false
 );
@@ -12,8 +12,8 @@ create table tm.app_user (
 create table tm.test (
   id serial primary key,
   title text not null,
-  desription text not null,
-  timeDescription text,
+  description text not null,
+  time_description text,
   default_time int not null,
   shuffle_questions boolean not null,
   shuffle_answers boolean not null,
@@ -24,6 +24,7 @@ create table tm.question (
   id serial primary key,
   test_id int not null references tm.test(id) on delete cascade,
   question text not null,
+  weight double precision not null,
   force_multi_answer boolean not null,
   time_override int,
   category text not null,

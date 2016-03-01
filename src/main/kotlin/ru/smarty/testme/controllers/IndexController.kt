@@ -12,6 +12,7 @@ import ru.smarty.testme.repositories.TestFileRepository
 import ru.smarty.testme.repositories.TestPassRepository
 import ru.smarty.testme.repositories.TestRepository
 import ru.smarty.testme.utils.currentUser
+import javax.persistence.EntityManager
 import javax.transaction.Transactional
 
 @Suppress("unused")
@@ -19,16 +20,18 @@ import javax.transaction.Transactional
 open class IndexController @Autowired constructor(
         private val testRepository: TestRepository,
         private val testFileRepository: TestFileRepository,
-        private val passRepository: TestPassRepository
+        private val passRepository: TestPassRepository,
+        private val entityManager: EntityManager
 ) {
     @RequestMapping("/")
-    fun index() = "index"
+    open fun index() = "index"
 
     @ResponseBody
     @RequestMapping("/data/tests")
     @JsonView(Views.Public::class)
-    fun tests(): List<TestData> {
-        val passes = passRepository.findByAppUser(currentUser()).groupBy { it.test.id }
+    open fun tests(): List<TestData> {
+        val allPasses = passRepository.findByAppUser(currentUser())
+        val passes = allPasses.groupBy { it.test.id }
 
         return testRepository.findAll().map { TestData(it.id, it, passes[it.id] ?: emptyList()) }
     }
@@ -37,7 +40,7 @@ open class IndexController @Autowired constructor(
 
     @ResponseBody
     @RequestMapping("/data/user")
-    fun user() = currentUser()
+    open fun user() = currentUser()
 
     @RequestMapping("/admin/import-files")
     @Transactional
@@ -46,8 +49,13 @@ open class IndexController @Autowired constructor(
         val sb = StringBuilder()
 
         testFileRepository.tests.forEach {
-            val saved = testRepository.save(it.value)
-            sb.append(saved.id).append(": ").append(saved.title).append("\n")
+            val test = it.value
+            test.rebind()
+
+            entityManager.persist(test)
+            entityManager.flush()
+
+            sb.append(test.id).append(": ").append(test.title).append("\n")
         }
 
         return Value(sb.toString())

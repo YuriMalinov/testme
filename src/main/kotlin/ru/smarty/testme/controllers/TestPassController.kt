@@ -11,21 +11,22 @@ import ru.smarty.testme.model.TestPass
 import ru.smarty.testme.model.Views
 import ru.smarty.testme.repositories.TestPassRepository
 import ru.smarty.testme.repositories.TestFileRepository
+import ru.smarty.testme.repositories.TestRepository
 import ru.smarty.testme.utils.currentUser
 
 @Suppress("unused")
 @Controller
 class TestPassController @Autowired constructor(
-        private val testRepository: TestFileRepository,
+        private val testRepository: TestRepository,
         private val passRepository: TestPassRepository
 ) {
 
-    data class ApplyRequest(val testCode: String)
+    data class ApplyRequest(val testId: Int)
 
     @ResponseBody
     @RequestMapping("/data/apply", method = arrayOf(RequestMethod.POST))
     fun apply(@RequestBody request: ApplyRequest): Value<String> {
-        val test = testRepository.testByCode(request.testCode) ?: throw NotFound("Can't find test with code [${request.testCode}]")
+        val test = testRepository.findOne(request.testId) ?: throw NotFound("Can't find test with code [${request.testId}]")
 
         val passCode = java.lang.Long.toUnsignedString(Math.round(Math.random() * Int.MAX_VALUE), 16)
         val pass = TestPass(passCode, currentUser(), test)
@@ -60,6 +61,7 @@ class TestPassController @Autowired constructor(
     data class CodeWithQuestionData(val testName: String, val passCode: String, val done: Boolean, val questionData: TestPass.QuestionData?)
 
     data class SubmitAnswerRequest(val passCode: String, val answers: List<Int>, val comment: String?, val textAnswer: String?)
+
 
     @ResponseBody
     @RequestMapping("/data/submit-answer", method = arrayOf(RequestMethod.POST))

@@ -15,7 +15,7 @@
         </div>
         <h3>{{ test.test.title }}</h3>
         <div><a class="btn btn-info" ng-click="toggleApply(test)">Подробнее</a> {{ test.test.time }}</div>
-        <div class="panel panel-primary" ng-if="show[test.code]">
+        <div class="panel panel-primary" ng-if="show[test.id]">
             <div class="panel-body">
                 <markdown text="test.test.description"></markdown>
             </div>

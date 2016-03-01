@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import ru.smarty.testme.model.AppUser
@@ -18,7 +19,7 @@ class UserDetailsServiceImpl @Autowired constructor(
     private var checkedEmptiness = false
     private val checkNewLock = ReentrantLock()
 
-    override fun loadUserByUsername(userName: String): UserDetails? {
+    override fun loadUserByUsername(userName: String): UserDetails {
         val details = userRepository.findByUserName(userName)
 
         val logger = LoggerFactory.getLogger(this.javaClass)
@@ -43,6 +44,6 @@ class UserDetailsServiceImpl @Autowired constructor(
             }
         }
 
-        return details
+        return details ?: throw UsernameNotFoundException("User [$userName] not found.")
     }
 }

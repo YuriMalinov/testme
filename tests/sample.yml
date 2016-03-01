@@ -7,7 +7,7 @@ description: |
   SELECT * FROM your_knowledge
   ```
 
-time: About 2 minutes   # Text description of time estimate
+timeDescription: About 2 minutes   # Text description of time estimate
 defaultTime: 65         # Default time for question, in seconds, could be overriden with timeOverride
 shuffleQuestions: true
 shuffleAnswers: true
