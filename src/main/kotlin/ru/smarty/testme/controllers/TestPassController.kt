@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.ResponseBody
 import ru.smarty.testme.model.TestPass
 import ru.smarty.testme.model.Views
 import ru.smarty.testme.repositories.TestPassRepository
-import ru.smarty.testme.repositories.TestRepository
+import ru.smarty.testme.repositories.TestFileRepository
 import ru.smarty.testme.utils.currentUser
 
 @Suppress("unused")
 @Controller
 class TestPassController @Autowired constructor(
-        private val testRepository: TestRepository,
+        private val testRepository: TestFileRepository,
         private val passRepository: TestPassRepository
 ) {
 
@@ -28,7 +28,7 @@ class TestPassController @Autowired constructor(
         val test = testRepository.testByCode(request.testCode) ?: throw NotFound("Can't find test with code [${request.testCode}]")
 
         val passCode = java.lang.Long.toUnsignedString(Math.round(Math.random() * Int.MAX_VALUE), 16)
-        val pass = TestPass(request.testCode, passCode, currentUser(), test)
+        val pass = TestPass(passCode, currentUser(), test)
         pass.startNext()
 
         passRepository.save(pass)
@@ -50,7 +50,7 @@ class TestPassController @Autowired constructor(
         }
 
         return CodeWithQuestionData(
-                testName = pass.testTitle,
+                testName = pass.test.title,
                 passCode = passCode,
                 done = pass.isDone(),
                 questionData = pass.currentQuestionData()

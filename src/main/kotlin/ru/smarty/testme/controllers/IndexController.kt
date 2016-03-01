@@ -3,25 +3,22 @@ package ru.smarty.testme.controllers
 import com.fasterxml.jackson.annotation.JsonView
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
-import org.springframework.ui.Model
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod.GET
-import org.springframework.web.bind.annotation.RequestMethod.POST
 import org.springframework.web.bind.annotation.ResponseBody
 import ru.smarty.testme.model.Test
 import ru.smarty.testme.model.TestPass
 import ru.smarty.testme.model.Views
+import ru.smarty.testme.repositories.TestFileRepository
 import ru.smarty.testme.repositories.TestPassRepository
 import ru.smarty.testme.repositories.TestRepository
 import ru.smarty.testme.utils.currentUser
-import java.io.CharArrayWriter
-import java.io.PrintWriter
+import javax.transaction.Transactional
 
 @Suppress("unused")
 @Controller
 open class IndexController @Autowired constructor(
         private val testRepository: TestRepository,
+        private val testFileRepository: TestFileRepository,
         private val passRepository: TestPassRepository
 ) {
     @RequestMapping("/")
@@ -31,26 +28,28 @@ open class IndexController @Autowired constructor(
     @RequestMapping("/data/tests")
     @JsonView(Views.Public::class)
     fun tests(): List<TestData> {
-        val passes = passRepository.findByAppUser(currentUser()).groupBy { it.testCode }
+        val passes = passRepository.findByAppUser(currentUser()).groupBy { it.test.id }
 
-        return testRepository.tests.map { TestData(it.key, it.value, passes[it.key] ?: emptyList()) }
+        return testRepository.findAll().map { TestData(it.id, it, passes[it.id] ?: emptyList()) }
     }
 
-    data class TestData(val code: String, val test: Test, val previousPasses: List<TestPass>)
+    data class TestData(val id: Int, val test: Test, val previousPasses: List<TestPass>)
 
     @ResponseBody
     @RequestMapping("/data/user")
     fun user() = currentUser()
 
-    @RequestMapping("/admin/refresh", method = arrayOf(GET))
-    fun refresh(): String {
-        try {
-            testRepository.updateTests()
-            return "OK"
-        } catch (e: Exception) {
-            val writer = PrintWriter(CharArrayWriter())
-            e.printStackTrace(writer)
-            return writer.toString()
+    @RequestMapping("/admin/import-files")
+    @Transactional
+    @ResponseBody
+    open fun importFiles(): Value<String> {
+        val sb = StringBuilder()
+
+        testFileRepository.tests.forEach {
+            val saved = testRepository.save(it.value)
+            sb.append(saved.id).append(": ").append(saved.title).append("\n")
         }
+
+        return Value(sb.toString())
     }
 }

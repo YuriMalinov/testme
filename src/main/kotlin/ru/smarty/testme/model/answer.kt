@@ -19,16 +19,8 @@ open class TestPass() {
     @get:GeneratedValue(strategy = GenerationType.IDENTITY)
     open var id: Int = 0
 
-    @get:Size(min = 1)
-    open var testCode: String = ""
-
-    @get:Size(min = 1)
-    open var testTitle: String = ""
-
-    @get:Size(min = 1)
-    open var testDescription: String = ""
-
-    open var testDefaultTime: Int = 0
+    @get:ManyToOne
+    open lateinit var test: Test
 
     @get:Size(min = 1)
     open var code: String = ""
@@ -49,9 +41,9 @@ open class TestPass() {
 
     open var created: Date = Date()
 
-    constructor(testCode: String, code: String, user: AppUser, test: Test) : this() {
+    constructor(code: String, user: AppUser, test: Test) : this() {
         questionsWithAnswer = test.questions.mapIndexed { i, question ->
-            QuestionAnswer(this, i, question)
+            QuestionAnswer(this, i, question, test.defaultTime)
         }.toMutableList()
 
         if (test.shuffleQuestions) {
@@ -60,10 +52,7 @@ open class TestPass() {
 
         questionsWithAnswer.forEachIndexed { i, questionAnswer -> questionAnswer.num = i }
 
-        this.testCode = testCode
-        this.testTitle = test.title
-        this.testDescription = test.description
-        this.testDefaultTime = test.defaultTime
+        this.test = test
         this.shuffleAnswers = test.shuffleAnswers
         this.code = code
         this.appUser = user
@@ -212,13 +201,13 @@ open class QuestionAnswer() {
             question = mapper.readValue(value, Question::class.java)
         }
 
-    open val time: Int
-        @Transient get() = question.timeOverride ?: testPass!!.testDefaultTime
+    open var time: Int = 0
 
-    constructor(testPass: TestPass, originalIndex: Int, question: Question) : this() {
+    constructor(testPass: TestPass, originalIndex: Int, question: Question, testDefaultTime: Int) : this() {
         this.originalIndex = originalIndex
         this.question = question
         this.testPass = testPass
+        this.time = question.timeOverride ?: testDefaultTime
     }
 
     fun start(now: Long = System.currentTimeMillis()) {
